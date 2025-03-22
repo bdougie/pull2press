@@ -40,7 +40,7 @@ export default function MarkdownEditor({
   };
 
   return (
-    <Card className="border border-[#d0d7de]">
+    <Card className="border border-[#d0d7de] bg-white">
       <Tabs defaultValue="edit" className="w-full">
         <div className="border-b border-[#d0d7de] px-4 py-2">
           <div className="flex justify-between items-center">
