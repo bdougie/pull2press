@@ -2,6 +2,8 @@
 
 Pull2Press is a tool that converts GitHub pull requests into publishable content. It leverages the GitHub API to fetch pull request data and uses OpenAI's API to transform technical changes into readable, structured content.
 
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/yourusername/pull2press)
+
 ## Features
 
 - GitHub pull request fetching and analysis
