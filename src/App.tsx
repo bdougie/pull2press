@@ -24,7 +24,9 @@ function App() {
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
 
@@ -37,17 +39,17 @@ function App() {
     setError(null);
 
     const formData = new FormData(e.currentTarget);
-    const prUrl = formData.get('pr-url') as string;
+    const prUrl = formData.get("pr-url") as string;
     setCurrentPrUrl(prUrl);
 
     try {
       // If user is logged in, check cache first
       if (user) {
         const { data: existingPosts } = await supabase
-          .from('cached_posts')
-          .select('*')
-          .eq('pr_url', prUrl)
-          .eq('user_id', user.id)
+          .from("cached_posts")
+          .select("*")
+          .eq("pr_url", prUrl)
+          .eq("user_id", user.id)
           .single();
 
         if (existingPosts) {
@@ -60,26 +62,26 @@ function App() {
       // Generate new content
       const prData = await fetchPRData(prUrl);
       const content = await generateBlogPost(prData);
-      
+
       // If user is logged in, save to Supabase
       if (user) {
         const { error: saveError } = await supabase
-          .from('cached_posts')
+          .from("cached_posts")
           .insert({
             pr_url: prUrl,
             content,
             title: prData.title,
-            user_id: user.id
+            user_id: user.id,
           });
 
         if (saveError) {
-          console.error('Error saving post:', saveError);
+          console.error("Error saving post:", saveError);
         }
       }
-      
+
       setBlogContent(content);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setIsLoading(false);
     }
@@ -93,23 +95,23 @@ function App() {
     try {
       const prData = await fetchPRData(currentPrUrl);
       const content = await generateBlogPost(prData);
-      
+
       // Update in Supabase if user is logged in
       if (user) {
         const { error: updateError } = await supabase
-          .from('cached_posts')
+          .from("cached_posts")
           .update({ content })
-          .eq('pr_url', currentPrUrl)
-          .eq('user_id', user.id);
+          .eq("pr_url", currentPrUrl)
+          .eq("user_id", user.id);
 
         if (updateError) {
-          console.error('Error updating post:', updateError);
+          console.error("Error updating post:", updateError);
         }
       }
-      
+
       setBlogContent(content);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setIsLoading(false);
     }
@@ -121,7 +123,7 @@ function App() {
   };
 
   return (
-    <main className="min-h-screen bg-[#f6f8fa]">
+    <div className="min-h-screen flex flex-col bg-[#f6f8fa]">
       <nav className="bg-white border-b border-[#d0d7de] px-4 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-2">
@@ -134,57 +136,86 @@ function App() {
           </div>
         </div>
       </nav>
-      
-      <div className="max-w-7xl mx-auto py-10 px-4">
-        {!blogContent ? (
-          <Card className="p-6">
-            <h2 className="text-2xl font-semibold mb-6">Transform Your Pull Request into a Blog Post</h2>
-            <p className="text-gray-600 mb-6">
-              Turn your code commits into engaging developer-friendly blog posts. Simply paste your pull request URL below to get started.
-            </p>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label htmlFor="pr-url" className="block text-sm font-medium text-gray-700 mb-1">
-                  Pull Request URL
-                </label>
-                <input
-                  type="url"
-                  id="pr-url"
-                  name="pr-url"
-                  className="w-full px-3 py-2 border border-[#d0d7de] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0969da] focus:border-transparent"
-                  placeholder="https://github.com/owner/repo/pull/123"
-                  required
-                />
-              </div>
-              {error && (
-                <p className="text-red-600 text-sm">{error}</p>
-              )}
-              <div className="space-y-3">
-                <Button 
-                  type="submit" 
-                  className="bg-[#2da44e] hover:bg-[#2c974b] text-white w-full"
-                  disabled={isLoading}
-                >
-                  {isLoading ? 'Generating...' : 'Generate Blog Post'}
-                </Button>
-                {!user && (
-                  <p className="text-sm text-muted-foreground text-center italic">
-                    Sign in to save your generated posts and access them later
-                  </p>
-                )}
-              </div>
-            </form>
-          </Card>
-        ) : (
-          <MarkdownEditor 
-            initialContent={blogContent}
-            onRegenerate={handleRegenerate}
-            isRegenerating={isLoading}
-            showSignInPrompt={!user}
-          />
-        )}
+
+      <div className="flex-grow container mx-auto px-4 py-8">
+        <div className="max-w-7xl mx-auto py-10 px-4">
+          {!blogContent ? (
+            <Card className="p-6 bg-white">
+              <h2 className="text-2xl font-semibold mb-6">
+                Transform Your Pull Request into a Blog Post
+              </h2>
+              <p className="text-gray-600 mb-6">
+                Turn your code commits into engaging developer-friendly blog
+                posts. Simply paste your pull request URL below to get started.
+              </p>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label
+                    htmlFor="pr-url"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Pull Request URL
+                  </label>
+                  <input
+                    type="url"
+                    id="pr-url"
+                    name="pr-url"
+                    className="w-full px-3 py-2 border border-[#d0d7de] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0969da] focus:border-transparent"
+                    placeholder="https://github.com/owner/repo/pull/123"
+                    required
+                  />
+                </div>
+                {error && <p className="text-red-600 text-sm">{error}</p>}
+                <div className="space-y-3">
+                  <Button
+                    type="submit"
+                    className="bg-[#2da44e] hover:bg-[#2c974b] text-white w-full"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Generating..." : "Generate Blog Post"}
+                  </Button>
+                  {!user && (
+                    <p className="text-sm text-muted-foreground text-center italic">
+                      Sign in to save your generated posts and access them later
+                    </p>
+                  )}
+                </div>
+              </form>
+            </Card>
+          ) : (
+            <MarkdownEditor
+              initialContent={blogContent}
+              onRegenerate={handleRegenerate}
+              isRegenerating={isLoading}
+              showSignInPrompt={!user}
+            />
+          )}
+        </div>
       </div>
-    </main>
+
+      <footer className="border-t border-gray-200 py-4 mt-auto bg-[#f6f8fa]">
+        <div className="container mx-auto px-4 text-center text-sm text-gray-500">
+          Generated using{" "}
+          <a
+            href="https://bolt.new"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:underline"
+          >
+            bolt.new
+          </a>{" "}
+          by{" "}
+          <a
+            href="https://b.dougie.dev"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:underline"
+          >
+            bdougie
+          </a>
+        </div>
+      </footer>
+    </div>
   );
 }
 
