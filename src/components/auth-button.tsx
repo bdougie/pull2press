@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "./ui/button";
 import { supabase } from "@/lib/supabase";
-import { LogIn, LogOut, Loader2, MessageSquare } from "lucide-react";
+import { LogIn, LogOut, Loader2 } from "lucide-react";
 import {
   Avatar,
   AvatarImage,
@@ -120,12 +120,17 @@ export function AuthButton() {
         <DropdownMenuTrigger asChild>
           <button className="flex items-center gap-2 rounded-md px-2 py-1 transition-colors hover:bg-accent focus:outline-none">
             <Avatar className="h-8 w-8 border border-border">
-              <AvatarImage src={avatarUrl} alt={githubUsername} />
-              <AvatarFallback className="bg-primary/10 text-primary">
-                {githubUsername?.[0]?.toUpperCase() || "U"}
-              </AvatarFallback>
+              {avatarUrl ? (
+                <AvatarImage src={avatarUrl} alt={githubUsername || "User"} />
+              ) : (
+                <AvatarFallback className="bg-primary/10 text-primary">
+                  {githubUsername?.[0]?.toUpperCase() || "U"}
+                </AvatarFallback>
+              )}
             </Avatar>
-            <span className="text-sm font-medium">{githubUsername}</span>
+            <span className="text-sm font-medium">
+              {githubUsername || "User"}
+            </span>
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56 bg-background">
@@ -147,7 +152,6 @@ export function AuthButton() {
               rel="noopener noreferrer"
               className="flex items-center"
             >
-              <MessageSquare className="mr-2 h-4 w-4" />
               <span>Give feedback</span>
             </a>
           </DropdownMenuItem>
