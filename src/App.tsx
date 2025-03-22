@@ -195,21 +195,12 @@ function App() {
 
       <footer className="border-t border-gray-200 py-4 mt-auto bg-[#f6f8fa]">
         <div className="container mx-auto px-4 text-center text-sm text-gray-500">
-          Generated using{" "}
-          <a
-            href="https://bolt.new"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-600 hover:underline"
-          >
-            bolt.new
-          </a>{" "}
-          by{" "}
+          Made with ❤️ from{" "}
           <a
             href="https://b.dougie.dev"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-600 hover:underline"
+            className="text-gray-600 hover:underline"
           >
             bdougie
           </a>
