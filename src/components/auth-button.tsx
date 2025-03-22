@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "./ui/button";
 import { supabase } from "@/lib/supabase";
-import { LogIn, LogOut, Loader2 } from "lucide-react";
+import { LogIn, LogOut, Loader2, MessageSquare } from "lucide-react";
 import {
   Avatar,
   AvatarImage,
@@ -136,6 +136,21 @@ export function AuthButton() {
               </p>
             </div>
           </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            className="cursor-pointer hover:bg-accent p-3 focus:bg-accent focus:outline-none"
+            asChild
+          >
+            <a
+              href="https://github.com/bdougie/pull2press/issues/new"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center"
+            >
+              <MessageSquare className="mr-2 h-4 w-4" />
+              <span>Give feedback</span>
+            </a>
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={handleSignOut}
