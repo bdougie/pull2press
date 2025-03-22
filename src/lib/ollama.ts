@@ -1,13 +1,5 @@
 import { PullRequestData, getSystemPrompt, buildUserPrompt } from './prompt-utils';
 
-// Ollama response type
-interface OllamaResponse {
-  model: string;
-  created_at: string;
-  response: string;
-  done: boolean;
-}
-
 // Ollama client configuration
 const OLLAMA_API_URL = import.meta.env.VITE_OLLAMA_API_URL || 'http://localhost:11434';
 const DEFAULT_MODEL = import.meta.env.VITE_OLLAMA_MODEL || 'llama3';
