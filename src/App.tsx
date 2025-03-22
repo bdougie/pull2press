@@ -206,7 +206,7 @@ function App() {
           </a>{" "}
           by{" "}
           <a
-            href="https://b.dougle.dev"
+            href="https://b.dougie.dev"
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-600 hover:underline"
