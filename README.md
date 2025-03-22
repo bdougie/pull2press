@@ -120,6 +120,65 @@ const response = await openai.chat.completions.create({
 const generatedContent = response.choices[0].message.content;
 ```
 
+### Local LLM Integration with Ollama
+
+Pull2Press supports local Large Language Models through Ollama for development and testing:
+
+1. When running in development mode, the application will attempt to use Ollama first
+2. If Ollama is not available, it falls back to OpenAI
+3. In production environments, OpenAI is used by default
+
+The Ollama processing pipeline:
+
+- Check if Ollama is available at the specified endpoint
+- Use the same prompt structure as the OpenAI implementation
+- Send requests to the local Ollama server
+- Process and format the response the same way as with OpenAI
+
+Example of Ollama API interaction:
+
+```javascript
+const response = await fetch(`${OLLAMA_API_URL}/api/chat`, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    model: DEFAULT_MODEL,
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userPrompt }
+    ],
+    options: {
+      temperature: 0.7,
+    },
+    stream: false,
+  }),
+});
+```
+
+### Shared Prompt Utilities
+
+To maintain consistency and avoid duplication, Pull2Press uses shared prompt utilities:
+
+- Common data structures and interfaces are defined in a central location
+- System prompts are standardized for all LLM providers
+- User prompt construction follows a consistent template
+
+Example of shared prompt utilities:
+
+```typescript
+// Shared system prompt
+export const getSystemPrompt = (): string => {
+  return `You are an expert technical writer and software engineer...`;
+};
+
+// Shared user prompt builder
+export const buildUserPrompt = (prData: PullRequestData): string => {
+  return `Write a detailed technical blog post about...`;
+};
+```
+
 ## Usage
 
 1. Navigate to the web interface
