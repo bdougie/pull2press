@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import { Eye, Edit2, Copy, Check, ExternalLink, RefreshCw, LogIn } from "lucide-react";
-import ReactMarkdown from 'react-markdown';
+import { Eye, Edit2, Copy, Check, ExternalLink, RefreshCw } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 import { AuthButton } from "./auth-button";
 
 interface MarkdownEditorProps {
@@ -13,11 +13,11 @@ interface MarkdownEditorProps {
   showSignInPrompt?: boolean;
 }
 
-export default function MarkdownEditor({ 
-  initialContent, 
-  onRegenerate, 
+export default function MarkdownEditor({
+  initialContent,
+  onRegenerate,
   isRegenerating,
-  showSignInPrompt 
+  showSignInPrompt,
 }: MarkdownEditorProps) {
   const [content, setContent] = useState(initialContent);
   const [copied, setCopied] = useState(false);
@@ -28,7 +28,7 @@ export default function MarkdownEditor({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('Failed to copy text:', err);
+      console.error("Failed to copy text:", err);
     }
   };
 
@@ -54,7 +54,7 @@ export default function MarkdownEditor({
                 Preview
               </TabsTrigger>
             </TabsList>
-            
+
             {onRegenerate && (
               <Button
                 variant="outline"
@@ -63,8 +63,10 @@ export default function MarkdownEditor({
                 disabled={isRegenerating}
                 className="flex items-center gap-2"
               >
-                <RefreshCw className={`h-4 w-4 ${isRegenerating ? 'animate-spin' : ''}`} />
-                {isRegenerating ? 'Regenerating...' : 'Regenerate'}
+                <RefreshCw
+                  className={`h-4 w-4 ${isRegenerating ? "animate-spin" : ""}`}
+                />
+                {isRegenerating ? "Regenerating..." : "Regenerate"}
               </Button>
             )}
           </div>
@@ -95,8 +97,8 @@ export default function MarkdownEditor({
             </div>
           )}
           <div className="flex gap-2">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={handleCopy}
               className="flex items-center gap-2"
             >
@@ -112,11 +114,7 @@ export default function MarkdownEditor({
                 </>
               )}
             </Button>
-            <a 
-              href={getBoltNewUrl()} 
-              target="_blank" 
-              rel="noopener noreferrer"
-            >
+            <a href={getBoltNewUrl()} target="_blank" rel="noopener noreferrer">
               <Button className="bg-[#2da44e] hover:bg-[#2c974b] text-white flex items-center gap-2">
                 <ExternalLink className="h-4 w-4" />
                 Create Astro Blog

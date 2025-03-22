@@ -1,11 +1,33 @@
 import OpenAI from 'openai';
 
+// Define proper types for PR data
+interface Commit {
+  message: string;
+  sha: string;
+  url: string;
+}
+
+interface File {
+  filename: string;
+  patch?: string;
+  status: string;
+  additions: number;
+  deletions: number;
+}
+
+interface PullRequestData {
+  title: string;
+  description: string;
+  commits: Commit[];
+  files: File[];
+}
+
 const openai = new OpenAI({
-  apiKey: import.meta.env.VITE_OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY || import.meta.env.VITE_OPENAI_API_KEY,
   dangerouslyAllowBrowser: true
 });
 
-export async function generateBlogPost(prData: any) {
+export async function generateBlogPost(prData: PullRequestData) {
   const systemPrompt = `You are an expert technical writer and software engineer with deep knowledge of modern development practices. Your task is to create engaging, technically accurate blog posts about code changes. When writing:
 
 - Use a clear, professional tone while keeping the content engaging
@@ -26,10 +48,10 @@ Changes:
 - Number of files modified: ${prData.files.length}
 
 Commit messages:
-${prData.commits.map(commit => `- ${commit.message}`).join('\n')}
+${prData.commits.map((commit: { message: string; sha: string; url: string }) => `- ${commit.message}`).join('\n')}
 
 Files changed:
-${prData.files.map(file => `- ${file.filename} (${file.additions} additions, ${file.deletions} deletions)`).join('\n')}
+${prData.files.map((file: { filename: string; patch?: string; status: string; additions: number; deletions: number }) => `- ${file.filename} (${file.additions} additions, ${file.deletions} deletions)`).join('\n')}
 
 Please write a comprehensive blog post that:
 1. Explains the purpose and context of these changes
