@@ -15,7 +15,7 @@ export async function generateBlogPost(prData: PullRequestData) {
       { role: "system", content: systemPrompt },
       { role: "user", content: userPrompt }
     ],
-    model: "gpt-4-turbo-preview",
+    model: "gpt-4-1106-preview",
     temperature: 0.7,
     max_tokens: 2000,
   });
