@@ -1,4 +1,3 @@
-import { GithubIcon } from "lucide-react";
 import { Button } from "./components/ui/button";
 import { Card } from "./components/ui/card";
 import { useState, useEffect } from "react";
@@ -127,8 +126,7 @@ function App() {
       <nav className="bg-white border-b border-[#d0d7de] px-4 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <GithubIcon className="h-6 w-6" />
-            <h1 className="text-xl font-semibold">Pull 2 Press</h1>
+            <h1 className="text-xl font-semibold">pull2press</h1>
           </div>
           <div className="flex items-center space-x-2">
             {user && <HistoryDrawer onSelectPost={handleSelectPost} />}

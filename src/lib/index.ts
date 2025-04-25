@@ -4,8 +4,7 @@ import { generateBlogPost as generateOllamaBlogPost, isOllamaAvailable } from '.
 // Function to choose the appropriate generator based on environment
 export async function generateBlogPost(prData: any) {
   // In development or local environment, try to use Ollama first
-  // Commenting the following block to always use OpenAI locally as well
-  /*
+  // run: DEV=false npm run dev to test OpenAI locally
   if (import.meta.env.DEV) {
     try {
       const ollamaAvailable = await isOllamaAvailable();
@@ -17,11 +16,8 @@ export async function generateBlogPost(prData: any) {
     }
   }
   
-  // Fall back to OpenAI
-  */
   // Always use OpenAI for testing
   return generateOpenAIBlogPost(prData);
-}
+export { generateOpenAIBlogPost, generateOllamaBlogPost, isOllamaAvailable };
+export { generateOpenAIBlogPost, generateOllamaBlogPost, isOllamaAvailable };
 
-export { generateOpenAIBlogPost, generateOllamaBlogPost, isOllamaAvailable };
-export { generateOpenAIBlogPost, generateOllamaBlogPost, isOllamaAvailable };
