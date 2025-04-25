@@ -18,6 +18,7 @@ export async function generateBlogPost(prData: any) {
   
   // Always use OpenAI for testing
   return generateOpenAIBlogPost(prData);
-export { generateOpenAIBlogPost, generateOllamaBlogPost, isOllamaAvailable };
+}
+
 export { generateOpenAIBlogPost, generateOllamaBlogPost, isOllamaAvailable };
 
