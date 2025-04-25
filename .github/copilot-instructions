@@ -1,0 +1,12 @@
+# Copilot Coding Instructions for Pull2Press (AI/Code Agents)
+
+- **Package Management**: Always use `npm` over `yarn`. All install, build, and script commands must use npm (e.g. `npm install`, `npm run dev`).
+- **Testing**: Use `vitest` for all JavaScript/TypeScript tests. Do not use jest or any other test framework, and never reference jest (even accidentally). All new tests and test file examples should use vitest syntax, runner, and conventions.
+- **React Structure**:
+    - Move reusable logic and side effects out of React components into hooks whenever possible.
+    - Hooks should be placed in the `hooks/` directory.
+    - Components should primarily handle rendering and props;
+      hooks should encapsulate data-fetching, business logic, mutations, and effectful code.
+- **General**:
+    - Adhere to project lint rules and formatting automatically.
+    - Use project aliases (e.g. `@/` for imports) when importing within `src`.
