@@ -14,7 +14,7 @@ Pull2Press is a tool that converts GitHub pull requests into publishable content
 ## Prerequisites
 
 - Node.js (v16 or higher)
-- npm or yarn
+- npm
 - GitHub account with personal access token
 - OpenAI API key
 
@@ -29,8 +29,6 @@ Pull2Press is a tool that converts GitHub pull requests into publishable content
 2. Install dependencies:
    ```bash
    npm install
-   # or
-   yarn install
    ```
 
 3. Create a `.env` file in the root directory with the following variables:
@@ -43,11 +41,33 @@ Pull2Press is a tool that converts GitHub pull requests into publishable content
 4. Start the development server:
    ```bash
    npm run dev
-   # or
-   yarn dev
    ```
 
 5. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Testing
+
+Pull2Press uses Vitest for testing. You can run tests using the following npm scripts:
+
+1. Run all tests once:
+   ```bash
+   npm test
+   ```
+
+2. Run tests in watch mode (for development):
+   ```bash
+   npm run test:watch
+   ```
+
+3. Run tests with UI:
+   ```bash
+   npm run test:ui
+   ```
+
+4. Generate test coverage report:
+   ```bash
+   npm run coverage
+   ```
 
 ## How It Works
 
