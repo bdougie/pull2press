@@ -1,12 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { MemoryRouter, Routes, Route } from "react-router-dom";
+import { MemoryRouter } from "react-router-dom";
 import Edit from "../pages/Edit";
-import Home from "../pages/Home";
 
 // Set up mocks at the top level
 const navigateMock = vi.fn();
-const locationStateMock = { state: null };
+const locationStateMock = {
+  state: null as { content: string; prUrl: string } | null,
+};
 
 // Mock the react-router-dom hooks
 vi.mock("react-router-dom", async () => {
@@ -58,7 +59,13 @@ vi.mock("../lib/github", () => ({
 
 // Mock the markdown editor component
 vi.mock("../components/markdown-editor", () => ({
-  default: ({ initialContent, onRegenerate }) => (
+  default: ({
+    initialContent,
+    onRegenerate,
+  }: {
+    initialContent: string;
+    onRegenerate: () => void;
+  }) => (
     <div data-testid="markdown-editor">
       <div data-testid="markdown-content">{initialContent}</div>
       <button onClick={onRegenerate} data-testid="regenerate-button">

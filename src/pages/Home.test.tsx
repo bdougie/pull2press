@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import Home from "../pages/Home";
-import Edit from "../pages/Edit";
 
 // Mock the navigate function
 const mockNavigate = vi.fn();
@@ -29,7 +28,7 @@ vi.mock("../lib/openai", () => ({
 }));
 
 vi.mock("../lib/github", () => ({
-  fetchPRData: (url) => mockFetchPRData(url),
+  fetchPRData: (url: string) => mockFetchPRData(url),
 }));
 
 // Mock the supabase client
