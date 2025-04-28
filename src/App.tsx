@@ -55,6 +55,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home user={user} />} />
             <Route path="/edit" element={<Edit user={user} />} />
+            <Route path="/edit/:id" element={<Edit user={user} />} />
           </Routes>
         </div>
       </div>

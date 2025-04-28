@@ -1,10 +1,17 @@
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { History, ExternalLink } from "lucide-react";
+import { History, ExternalLink, Edit as EditIcon } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import type { CachedPost } from "@/lib/supabase";
+import { useNavigate } from "react-router-dom";
 
 interface HistoryDrawerProps {
   onSelectPost: (post: CachedPost) => void;
@@ -13,6 +20,7 @@ interface HistoryDrawerProps {
 export function HistoryDrawer({ onSelectPost }: HistoryDrawerProps) {
   const [posts, setPosts] = useState<CachedPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -20,13 +28,13 @@ export function HistoryDrawer({ onSelectPost }: HistoryDrawerProps) {
       if (!session?.session?.user) return;
 
       const { data, error } = await supabase
-        .from('cached_posts')
-        .select('*')
-        .eq('user_id', session.session.user.id)
-        .order('created_at', { ascending: false });
+        .from("cached_posts")
+        .select("*")
+        .eq("user_id", session.session.user.id)
+        .order("created_at", { ascending: false });
 
       if (error) {
-        console.error('Error fetching posts:', error);
+        console.error("Error fetching posts:", error);
         return;
       }
 
@@ -38,20 +46,29 @@ export function HistoryDrawer({ onSelectPost }: HistoryDrawerProps) {
 
     // Subscribe to changes
     const channel = supabase
-      .channel('cached_posts_changes')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'cached_posts'
-      }, () => {
-        fetchPosts();
-      })
+      .channel("cached_posts_changes")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "cached_posts",
+        },
+        () => {
+          fetchPosts();
+        }
+      )
       .subscribe();
 
     return () => {
       channel.unsubscribe();
     };
   }, []);
+
+  const handleEditClick = (e: React.MouseEvent, post: CachedPost) => {
+    e.stopPropagation();
+    navigate(`/edit/${post.id}`);
+  };
 
   return (
     <Sheet>
@@ -83,15 +100,24 @@ export function HistoryDrawer({ onSelectPost }: HistoryDrawerProps) {
                 >
                   <div className="flex items-center justify-between">
                     <h3 className="font-medium">{post.title}</h3>
-                    <a
-                      href={post.pr_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                      className="text-muted-foreground hover:text-foreground"
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                    </a>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={(e) => handleEditClick(e, post)}
+                        className="text-muted-foreground hover:text-foreground"
+                        aria-label="Edit post"
+                      >
+                        <EditIcon className="h-4 w-4" />
+                      </button>
+                      <a
+                        href={post.pr_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-muted-foreground hover:text-foreground"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                      </a>
+                    </div>
                   </div>
                   <p className="text-sm text-muted-foreground mt-1">
                     {new Date(post.created_at).toLocaleDateString()}
