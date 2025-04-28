@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { MemoryRouter, Routes, Route } from "react-router-dom";
+import { MemoryRouter } from "react-router-dom";
 import Edit from "../pages/Edit";
 
 // Set up mocks at the top level
@@ -39,7 +39,7 @@ vi.mock("../lib/supabase", () => {
     supabase: {
       from: () => ({
         select: () => ({
-          eq: (field: string, value: string) => ({
+          eq: (_field: string, value: string) => ({
             single: () => {
               if (value === "test-post-id") {
                 return Promise.resolve({ data: mockPostData, error: null });
@@ -98,6 +98,11 @@ vi.mock("../components/markdown-editor", () => ({
     onRegenerate,
     isRegenerating,
     showSignInPrompt,
+  }: {
+    initialContent: string;
+    onRegenerate: () => void;
+    isRegenerating: boolean;
+    showSignInPrompt: boolean;
   }) => (
     <div data-testid="markdown-editor">
       <div data-testid="markdown-content">{initialContent}</div>
