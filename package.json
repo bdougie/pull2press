@@ -54,6 +54,7 @@
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.50.1",
     "react-markdown": "^9.0.1",
+    "react-router-dom": "^7.5.2",
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.22.4"
