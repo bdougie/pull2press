@@ -4,8 +4,11 @@ import { HistoryDrawer } from "./components/history-drawer";
 import { supabase } from "./lib/supabase";
 import type { CachedPost } from "./lib/supabase";
 import { Routes, Route, useNavigate } from "react-router-dom";
+import { Button } from "./components/ui/button";
+import { Settings as SettingsIcon } from "lucide-react";
 import Home from "./pages/Home";
 import Edit from "./pages/Edit";
+import Settings from "./pages/Settings";
 
 function App() {
   const [user, setUser] = useState<any>(null);
@@ -45,6 +48,17 @@ function App() {
           </div>
           <div className="flex items-center space-x-2">
             {user && <HistoryDrawer onSelectPost={handleSelectPost} />}
+            {user && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/settings')}
+                className="flex items-center gap-2"
+              >
+                <SettingsIcon className="h-4 w-4" />
+                Settings
+              </Button>
+            )}
             <AuthButton />
           </div>
         </div>
@@ -56,6 +70,7 @@ function App() {
             <Route path="/" element={<Home user={user} />} />
             <Route path="/edit" element={<Edit user={user} />} />
             <Route path="/edit/:id" element={<Edit user={user} />} />
+            <Route path="/settings" element={<Settings user={user} />} />
           </Routes>
         </div>
       </div>

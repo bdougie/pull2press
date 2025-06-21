@@ -1,24 +1,35 @@
-import OpenAI from 'openai';
 import { PullRequestData, getSystemPrompt, buildUserPrompt } from './prompt-utils';
 
-const openai = new OpenAI({
-  apiKey: import.meta.env.VITE_OPENAI_API_KEY,
-  dangerouslyAllowBrowser: true
-});
+export async function generateBlogPost(
+  prData: PullRequestData,
+  options?: {
+    systemPrompt?: string;
+    userPrompt?: string;
+    temperature?: number;
+  }
+) {
+  const systemPrompt = options?.systemPrompt || getSystemPrompt();
+  const userPrompt = options?.userPrompt || buildUserPrompt(prData);
+  const temperature = options?.temperature || 0.7;
 
-export async function generateBlogPost(prData: PullRequestData) {
-  const systemPrompt = getSystemPrompt();
-  const userPrompt = buildUserPrompt(prData);
-
-  const completion = await openai.chat.completions.create({
-    messages: [
-      { role: "system", content: systemPrompt },
-      { role: "user", content: userPrompt }
-    ],
-    model: "gpt-4-1106-preview",
-    temperature: 0.7,
-    max_tokens: 2000,
+  // Use server-side API route for OpenAI calls
+  const response = await fetch('/api/generate-content', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      systemPrompt,
+      userPrompt,
+      temperature,
+    }),
   });
 
-  return completion.choices[0].message.content || '';
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || 'Failed to generate content');
+  }
+
+  const data = await response.json();
+  return data.content;
 }
