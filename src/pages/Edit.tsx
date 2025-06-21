@@ -6,6 +6,13 @@ import { supabase } from "../lib/supabase";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import {
+  buildEnhancedSystemPrompt,
+  buildEnhancedUserPrompt,
+  getTemperature,
+  type RegenerationPreset,
+  type UserPreferences
+} from "../lib/enhanced-prompt-utils";
 
 export default function Edit({ user }: { user: any }) {
   const [blogContent, setBlogContent] = useState<string | null>(null);
@@ -66,13 +73,55 @@ export default function Edit({ user }: { user: any }) {
     }
   }, [params.id, location, navigate]);
 
-  const handleRegenerate = async () => {
+  const handleRegenerate = async (options?: {
+    preset?: RegenerationPreset;
+    customPrompt?: string;
+    useUserStyle?: boolean;
+  }) => {
     if (!currentPrUrl) return;
     setIsLoading(true);
 
     try {
       const prData = await fetchPRData(currentPrUrl);
-      const content = await generateBlogPost(prData);
+      
+      let userPreferences: UserPreferences | undefined;
+      
+      // Load user preferences if needed
+      if (user && (options?.useUserStyle || !options)) {
+        try {
+          const { data } = await supabase
+            .from("user_preferences")
+            .select("*")
+            .eq("user_id", user.id)
+            .single();
+          
+          if (data) {
+            userPreferences = data;
+          }
+        } catch (err) {
+          console.error("Error loading user preferences:", err);
+        }
+      }
+      
+      // Build enhanced prompts
+      const regenerationOptions = {
+        type: (options?.preset ? 'preset' : options?.customPrompt ? 'custom' : options?.useUserStyle ? 'user_style' : 'preset') as 'preset' | 'custom' | 'user_style',
+        preset: options?.preset,
+        customPrompt: options?.customPrompt,
+        userPreferences,
+        temperature: options?.preset?.temperature
+      };
+      
+      const systemPrompt = buildEnhancedSystemPrompt(userPreferences, regenerationOptions);
+      const userPrompt = buildEnhancedUserPrompt(prData, regenerationOptions);
+      const temperature = getTemperature(regenerationOptions);
+      
+      // Generate with enhanced prompts
+      const content = await generateBlogPost(prData, {
+        systemPrompt,
+        userPrompt,
+        temperature
+      });
 
       // Update in Supabase if user is logged in
       if (user) {
@@ -130,6 +179,7 @@ export default function Edit({ user }: { user: any }) {
         onRegenerate={handleRegenerate}
         isRegenerating={isLoading}
         showSignInPrompt={!user}
+        user={user}
       />
     </div>
   );

@@ -6,6 +6,7 @@ import type { CachedPost } from "./lib/supabase";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Edit from "./pages/Edit";
+import Settings from "./pages/Settings";
 
 function App() {
   const [user, setUser] = useState<any>(null);
@@ -56,6 +57,7 @@ function App() {
             <Route path="/" element={<Home user={user} />} />
             <Route path="/edit" element={<Edit user={user} />} />
             <Route path="/edit/:id" element={<Edit user={user} />} />
+            <Route path="/settings" element={<Settings user={user} />} />
           </Routes>
         </div>
       </div>

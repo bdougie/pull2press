@@ -70,7 +70,7 @@ async function fetchPRData(prUrl: string) {
 
 export async function POST(req: Request) {
   try {
-    const { prUrl } = await req.json();
+    const { prUrl, systemPrompt, userPrompt, temperature } = await req.json();
 
     if (!process.env.GITHUB_TOKEN) {
       return NextResponse.json(
@@ -81,10 +81,39 @@ export async function POST(req: Request) {
 
     const prData = await fetchPRData(prUrl);
 
-    // TODO: Use Vercel AI SDK to generate blog post
-    // For now, return the fetched PR data
+    // If systemPrompt and userPrompt are provided, generate content
+    if (systemPrompt && userPrompt) {
+      if (!process.env.OPENAI_API_KEY) {
+        return NextResponse.json(
+          { error: "OpenAI API key not configured" },
+          { status: 500 }
+        );
+      }
+
+      const openai = new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
+      });
+
+      const completion = await openai.chat.completions.create({
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt }
+        ],
+        model: "gpt-4-1106-preview",
+        temperature: temperature || 0.7,
+        max_tokens: 2000,
+      });
+
+      const content = completion.choices[0].message.content || '';
+
+      return NextResponse.json({
+        content,
+        prData,
+      });
+    }
+
+    // For backwards compatibility, return just PR data
     return NextResponse.json({
-      content: `# ${prData.title}\n\n${prData.description}\n\n## Changes\n\nThis pull request includes ${prData.commits.length} commits and modifies ${prData.files.length} files.`,
       prData,
     });
   } catch (error) {

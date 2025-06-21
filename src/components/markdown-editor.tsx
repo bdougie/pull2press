@@ -2,15 +2,21 @@ import { useState } from "react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import { Eye, Edit2, Copy, Check, ExternalLink, RefreshCw } from "lucide-react";
+import { Eye, Edit2, Copy, Check, ExternalLink } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { AuthButton } from "./auth-button";
+import RegenerationDropdown from "./regeneration-dropdown";
 
 interface MarkdownEditorProps {
   initialContent: string;
-  onRegenerate?: () => void;
+  onRegenerate?: (options?: {
+    preset?: any;
+    customPrompt?: string;
+    useUserStyle?: boolean;
+  }) => void;
   isRegenerating?: boolean;
   showSignInPrompt?: boolean;
+  user?: any;
 }
 
 export default function MarkdownEditor({
@@ -18,6 +24,7 @@ export default function MarkdownEditor({
   onRegenerate,
   isRegenerating,
   showSignInPrompt,
+  user,
 }: MarkdownEditorProps) {
   const [content, setContent] = useState(initialContent);
   const [copied, setCopied] = useState(false);
@@ -56,18 +63,11 @@ export default function MarkdownEditor({
             </TabsList>
 
             {onRegenerate && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onRegenerate}
-                disabled={isRegenerating}
-                className="flex items-center gap-2"
-              >
-                <RefreshCw
-                  className={`h-4 w-4 ${isRegenerating ? "animate-spin" : ""}`}
-                />
-                {isRegenerating ? "Regenerating..." : "Regenerate"}
-              </Button>
+              <RegenerationDropdown
+                onRegenerate={onRegenerate}
+                isRegenerating={isRegenerating || false}
+                user={user}
+              />
             )}
           </div>
         </div>

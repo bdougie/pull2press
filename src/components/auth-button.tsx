@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Button } from "./ui/button";
 import { supabase } from "@/lib/supabase";
-import { LogIn, LogOut, Loader2 } from "lucide-react";
+import { LogIn, LogOut, Loader2, Settings } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import {
   Avatar,
   AvatarImage,
@@ -22,6 +23,7 @@ export function AuthButton() {
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<any>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Check current session
@@ -142,6 +144,13 @@ export function AuthButton() {
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onClick={() => navigate('/settings')}
+            className="cursor-pointer hover:bg-accent p-3 focus:bg-accent focus:outline-none"
+          >
+            <Settings className="mr-2 h-4 w-4" />
+            <span>Settings</span>
+          </DropdownMenuItem>
           <DropdownMenuItem
             className="cursor-pointer hover:bg-accent p-3 focus:bg-accent focus:outline-none"
             asChild
