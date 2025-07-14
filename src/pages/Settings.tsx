@@ -75,9 +75,9 @@ export default function Settings({ user }: { user: any }) {
 
       if (error) {
         console.error('Error saving preferences:', error);
-        alert('Failed to save preferences. Please try again.');
+        window.alert('Failed to save preferences. Please try again.');
       } else {
-        alert('Preferences saved successfully!');
+        window.alert('Preferences saved successfully!');
       }
     } catch (err) {
       console.error('Error saving preferences:', err);

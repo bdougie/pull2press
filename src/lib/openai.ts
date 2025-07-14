@@ -1,4 +1,5 @@
 import { PullRequestData, getSystemPrompt, buildUserPrompt } from './prompt-utils';
+import { supabase } from './supabase';
 
 export async function generateBlogPost(
   prData: PullRequestData,
@@ -12,24 +13,23 @@ export async function generateBlogPost(
   const userPrompt = options?.userPrompt || buildUserPrompt(prData);
   const temperature = options?.temperature || 0.7;
 
-  // Use server-side API route for OpenAI calls
-  const response = await fetch('/api/generate-content', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
+  // Use Supabase Edge Function for OpenAI calls
+  const { data, error } = await supabase.functions.invoke('generate-content', {
+    body: {
       systemPrompt,
       userPrompt,
       temperature,
-    }),
+    },
   });
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || 'Failed to generate content');
+  if (error) {
+    console.error('Error calling Supabase function:', error);
+    throw new Error(error.message || 'Failed to generate content');
   }
 
-  const data = await response.json();
+  if (!data || !data.content) {
+    throw new Error('No content generated');
+  }
+
   return data.content;
 }
