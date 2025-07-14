@@ -1,4 +1,4 @@
-import { Progress } from "./ui/progress";
+import { Progress } from "../../components/ui/progress";
 import { Loader2, GitPullRequest, FileCode, Sparkles, CheckCircle } from "lucide-react";
 import { FetchProgress } from "../lib/github-optimized";
 
