@@ -39,3 +39,7 @@ next-env.d.ts
 dist/
 
 .mcp.json
+
+# Supabase
+supabase/.temp/
+supabase/.branches/
