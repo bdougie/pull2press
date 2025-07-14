@@ -22,21 +22,19 @@ export default function Home({ user }: { user: any }) {
     try {
       // If user is logged in, check cache first
       if (user) {
-        const { data: existingPosts } = await supabase
+        const { data: existingPosts, error: fetchError } = await supabase
           .from("cached_posts")
           .select("*")
           .eq("pr_url", prUrl)
-          .eq("user_id", user.id)
-          .single();
+          .eq("user_id", user.id);
 
-        if (existingPosts) {
-          // Navigate to edit page with content
-          navigate(`/edit`, { 
-            state: { 
-              content: existingPosts.content,
-              prUrl: prUrl 
-            } 
-          });
+        if (fetchError && fetchError.code !== 'PGRST116') {
+          console.error("Error fetching cached posts:", fetchError);
+        }
+
+        if (existingPosts && existingPosts.length > 0) {
+          // Navigate to edit page with the post ID
+          navigate(`/edit/${existingPosts[0].id}`);
           return;
         }
       }
@@ -46,28 +44,37 @@ export default function Home({ user }: { user: any }) {
       const content = await generateBlogPost(prData);
 
       // If user is logged in, save to Supabase
+      let postId = null;
       if (user) {
-        const { error: saveError } = await supabase
+        const { data: savedPost, error: saveError } = await supabase
           .from("cached_posts")
           .insert({
             pr_url: prUrl,
             content,
             title: prData.title,
             user_id: user.id,
-          });
+          })
+          .select()
+          .single();
 
         if (saveError) {
           console.error("Error saving post:", saveError);
+        } else if (savedPost) {
+          postId = savedPost.id;
         }
       }
 
       // Navigate to edit page with content
-      navigate(`/edit`, { 
-        state: { 
-          content: content,
-          prUrl: prUrl 
-        } 
-      });
+      if (postId) {
+        navigate(`/edit/${postId}`);
+      } else {
+        navigate(`/edit`, { 
+          state: { 
+            content: content,
+            prUrl: prUrl 
+          } 
+        });
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
       setIsLoading(false);

@@ -12,8 +12,12 @@ export async function generateBlogPost(
   const userPrompt = options?.userPrompt || buildUserPrompt(prData);
   const temperature = options?.temperature || 0.7;
 
-  // Use server-side API route for OpenAI calls
-  const response = await fetch('/api/generate-content', {
+  // Use Netlify Function for OpenAI calls
+  const endpoint = import.meta.env.DEV 
+    ? '/.netlify/functions/generate-content'
+    : '/.netlify/functions/generate-content';
+    
+  const response = await fetch(endpoint, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
