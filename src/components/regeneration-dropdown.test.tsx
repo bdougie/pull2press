@@ -1,9 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 import RegenerationDropdown from './regeneration-dropdown';
-import { supabase } from '../lib/supabase';
-import type { RegenerationPreset, UserPreferences } from '../lib/enhanced-prompt-utils';
 
 // Mock Supabase with simplified implementation
 vi.mock('../lib/supabase', () => ({
@@ -22,41 +19,6 @@ vi.mock('../lib/supabase', () => ({
 
 describe('RegenerationDropdown', () => {
   const mockOnRegenerate = vi.fn();
-  const mockUser = { id: 'user123', email: 'test@example.com' };
-  
-  const mockPresets: RegenerationPreset[] = [
-    {
-      id: '1',
-      name: 'More Casual',
-      description: 'Make it conversational',
-      system_prompt_modifier: 'Be casual',
-      user_prompt_modifier: 'Rewrite casually',
-      temperature: 0.8,
-      is_default: true,
-      created_at: new Date().toISOString()
-    },
-    {
-      id: '2',
-      name: 'More Technical',
-      description: 'Add technical depth',
-      system_prompt_modifier: 'Be technical',
-      user_prompt_modifier: 'Add technical details',
-      temperature: 0.7,
-      is_default: true,
-      created_at: new Date().toISOString()
-    }
-  ];
-
-  const mockUserPreferences: UserPreferences = {
-    id: 'pref123',
-    user_id: 'user123',
-    writing_samples: ['Sample text'],
-    preferred_tone: 'professional',
-    preferred_length: 'medium',
-    custom_instructions: 'Keep it simple',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  };
 
   beforeEach(() => {
     vi.clearAllMocks();
