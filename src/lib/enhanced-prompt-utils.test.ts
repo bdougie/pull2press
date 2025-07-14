@@ -215,11 +215,11 @@ describe('buildEnhancedUserPrompt', () => {
     title: 'Add new feature',
     description: 'This PR adds a new feature',
     commits: [
-      { message: 'Initial implementation' },
-      { message: 'Add tests' }
+      { message: 'Initial implementation', sha: 'abc123', url: 'https://github.com/owner/repo/commit/abc123' },
+      { message: 'Add tests', sha: 'def456', url: 'https://github.com/owner/repo/commit/def456' }
     ],
     files: [
-      { filename: 'src/feature.ts', additions: 50, deletions: 10 }
+      { filename: 'src/feature.ts', additions: 50, deletions: 10, status: 'modified' }
     ]
   };
 
