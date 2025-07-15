@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import MarkdownEditor from "../components/markdown-editor";
 import { generateBlogPost } from "../lib/openai";
-import { fetchPRData } from "../lib/github";
+import { fetchPRDataEnhanced } from "../lib/github-enhanced";
 import { supabase } from "../lib/supabase";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Button } from "../components/ui/button";
@@ -13,12 +13,19 @@ import {
   type RegenerationPreset,
   type UserPreferences
 } from "../lib/enhanced-prompt-utils";
+import { EnhancedLoadingProgress } from "../components/enhanced-loading-progress";
 
 export default function Edit({ user }: { user: any }) {
   const [blogContent, setBlogContent] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [currentPrUrl, setCurrentPrUrl] = useState<string | null>(null);
   const [postId, setPostId] = useState<string | null>(null);
+  const [progress, setProgress] = useState({
+    stage: 'idle' as 'idle' | 'pr' | 'comments' | 'files' | 'generating',
+    progress: 0,
+    message: '',
+    details: null as any
+  });
   const location = useLocation();
   const navigate = useNavigate();
   const params = useParams<{ id?: string }>();
@@ -82,7 +89,16 @@ export default function Edit({ user }: { user: any }) {
     setIsLoading(true);
 
     try {
-      const prData = await fetchPRData(currentPrUrl);
+      setProgress({
+        stage: 'pr',
+        progress: 0,
+        message: 'Fetching PR data...',
+        details: null
+      });
+      
+      const prData = await fetchPRDataEnhanced(currentPrUrl, (progressUpdate) => {
+        setProgress(progressUpdate);
+      });
       
       let userPreferences: UserPreferences | undefined;
       
@@ -117,6 +133,13 @@ export default function Edit({ user }: { user: any }) {
       const temperature = getTemperature(regenerationOptions);
       
       // Generate with enhanced prompts
+      setProgress({
+        stage: 'generating',
+        progress: 90,
+        message: 'Generating blog post...',
+        details: null
+      });
+      
       const content = await generateBlogPost(prData, {
         systemPrompt,
         userPrompt,
@@ -145,12 +168,23 @@ export default function Edit({ user }: { user: any }) {
       console.error("Error regenerating:", err);
     } finally {
       setIsLoading(false);
+      setProgress({
+        stage: 'idle',
+        progress: 0,
+        message: '',
+        details: null
+      });
     }
   };
 
   const handleBackClick = () => {
     navigate("/");
   };
+
+  // Show enhanced loading progress when regenerating
+  if (isLoading && progress.stage !== 'idle') {
+    return <EnhancedLoadingProgress progress={progress} />;
+  }
 
   if (isLoading) {
     return <div className="text-center py-12">Loading...</div>;
