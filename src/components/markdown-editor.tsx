@@ -6,6 +6,7 @@ import { Eye, Edit2, Copy, Check, ExternalLink } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { AuthButton } from "./auth-button";
 import RegenerationDropdown from "./regeneration-dropdown";
+import { PromptEditor } from "./prompt-editor/PromptEditor";
 
 interface MarkdownEditorProps {
   initialContent: string;
@@ -36,6 +37,17 @@ export default function MarkdownEditor({
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error("Failed to copy text:", err);
+    }
+  };
+
+  const handleTextReplace = (originalText: string, newText: string) => {
+    // Replace the selected text with the new text
+    const currentContent = content;
+    const index = currentContent.indexOf(originalText);
+    if (index !== -1) {
+      const before = currentContent.substring(0, index);
+      const after = currentContent.substring(index + originalText.length);
+      setContent(before + newText + after);
     }
   };
 
@@ -73,12 +85,14 @@ export default function MarkdownEditor({
         </div>
 
         <TabsContent value="edit" className="p-0">
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className="w-full h-[500px] p-4 font-mono text-sm border-none focus:outline-none resize-none"
-            placeholder="Write your blog post in Markdown..."
-          />
+          <PromptEditor onTextReplace={handleTextReplace}>
+            <textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              className="w-full h-[500px] p-4 font-mono text-sm border-none focus:outline-none resize-none"
+              placeholder="Write your blog post in Markdown..."
+            />
+          </PromptEditor>
         </TabsContent>
 
         <TabsContent value="preview" className="p-4">
