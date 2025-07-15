@@ -10,6 +10,7 @@ interface SimplePromptEditorProps {
 export function SimplePromptEditor({ children, onTextReplace }: SimplePromptEditorProps) {
   const [showSidebar, setShowSidebar] = useState(false);
   const [selectedText, setSelectedText] = useState('');
+  const [isAllTextSelected, setIsAllTextSelected] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -23,7 +24,13 @@ export function SimplePromptEditor({ children, onTextReplace }: SimplePromptEdit
         
         if (text && text.length > 0) {
           console.log('Selection found:', text);
+          
+          // Check if all text is selected
+          const textarea = containerRef.current?.querySelector('textarea');
+          const isAll = textarea && textarea.value.trim() === text;
+          
           setSelectedText(text);
+          setIsAllTextSelected(isAll || false);
           setShowSidebar(true);
         }
       }, 100);
@@ -68,6 +75,7 @@ export function SimplePromptEditor({ children, onTextReplace }: SimplePromptEdit
           isOpen={showSidebar}
           onClose={handleClose}
           onApply={handleApply}
+          isAllTextSelected={isAllTextSelected}
         />,
         document.body
       )}

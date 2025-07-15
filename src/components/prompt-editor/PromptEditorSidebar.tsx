@@ -8,6 +8,7 @@ interface PromptEditorSidebarProps {
   isOpen: boolean;
   onClose: () => void;
   onApply: (newText: string) => void;
+  isAllTextSelected?: boolean;
 }
 
 interface Message {
@@ -27,7 +28,8 @@ export function PromptEditorSidebar({
   selectedText, 
   isOpen,
   onClose, 
-  onApply 
+  onApply,
+  isAllTextSelected = false 
 }: PromptEditorSidebarProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -171,7 +173,9 @@ export function PromptEditorSidebar({
 
           {/* Selected text preview */}
           <div className="p-3 bg-[#f6f8fa] border-b border-[#d0d7de]">
-            <p className="text-xs text-[#57606a] mb-1">Selected text:</p>
+            <p className="text-xs text-[#57606a] mb-1">
+              {isAllTextSelected ? 'Selected all text:' : 'Selected text:'}
+            </p>
             <p className="text-sm text-[#24292f] line-clamp-3">{selectedText}</p>
           </div>
 
