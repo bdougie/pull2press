@@ -7,6 +7,7 @@ import { Routes, Route, useNavigate, Link } from "react-router-dom";
 import HomeEnhanced from "./pages/HomeEnhanced";
 import Edit from "./pages/Edit";
 import Settings from "./pages/Settings";
+import Loading from "./pages/Loading";
 
 function App() {
   const [user, setUser] = useState<any>(null);
@@ -60,6 +61,7 @@ function App() {
             <Route path="/edit" element={<Edit user={user} />} />
             <Route path="/edit/:id" element={<Edit user={user} />} />
             <Route path="/settings" element={<Settings user={user} />} />
+            <Route path="/loading" element={<Loading />} />
           </Routes>
         </div>
       </div>
