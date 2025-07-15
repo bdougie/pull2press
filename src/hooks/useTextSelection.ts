@@ -15,39 +15,39 @@ export function useTextSelection(containerRef?: React.RefObject<HTMLElement>) {
 
   const updateSelection = useCallback(() => {
     const sel = window.getSelection();
-    if (!sel || sel.isCollapsed) {
+    console.log('Selection object:', sel);
+    
+    if (!sel || sel.rangeCount === 0) {
+      console.log('No selection or no ranges');
       setSelection({ text: '', rect: null, isCollapsed: true });
       return;
     }
 
-    const text = sel.toString().trim();
-    if (!text) {
+    const text = sel.toString();
+    console.log('Selected text:', text, 'Collapsed:', sel.isCollapsed);
+    
+    if (!text || sel.isCollapsed) {
       setSelection({ text: '', rect: null, isCollapsed: true });
       return;
     }
 
-    // Check if selection is within our container (if provided)
-    if (containerRef?.current) {
+    try {
+      // Get the bounding rectangle of the selection
       const range = sel.getRangeAt(0);
-      const container = containerRef.current;
-      if (!container.contains(range.commonAncestorContainer)) {
-        setSelection({ text: '', rect: null, isCollapsed: true });
-        return;
-      }
+      const rect = range.getBoundingClientRect();
+
+      console.log('Text selected:', text.trim(), 'Rect:', rect);
+
+      setSelection({
+        text: text.trim(),
+        rect,
+        isCollapsed: false,
+      });
+    } catch (error) {
+      console.error('Error getting selection range:', error);
+      setSelection({ text: '', rect: null, isCollapsed: true });
     }
-
-    // Get the bounding rectangle of the selection
-    const range = sel.getRangeAt(0);
-    const rect = range.getBoundingClientRect();
-
-    console.log('Text selected:', text, 'Rect:', rect);
-
-    setSelection({
-      text,
-      rect,
-      isCollapsed: false,
-    });
-  }, [containerRef]);
+  }, []);
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
@@ -55,7 +55,10 @@ export function useTextSelection(containerRef?: React.RefObject<HTMLElement>) {
     const delayedUpdateSelection = () => {
       // Add a small delay to ensure selection is complete
       clearTimeout(timeoutId);
-      timeoutId = setTimeout(updateSelection, 100);
+      timeoutId = setTimeout(() => {
+        console.log('Delayed update triggered');
+        updateSelection();
+      }, 200);
     };
     
     // Listen for selection changes
@@ -66,6 +69,9 @@ export function useTextSelection(containerRef?: React.RefObject<HTMLElement>) {
     
     // Listen for keyboard events that might change selection
     document.addEventListener('keyup', delayedUpdateSelection);
+    
+    // Check initial selection
+    updateSelection();
 
     return () => {
       clearTimeout(timeoutId);

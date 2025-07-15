@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useTextSelection } from '../../hooks/useTextSelection';
 import { PromptEditorPopup } from './PromptEditorPopup';
 import { createPortal } from 'react-dom';
@@ -9,8 +9,7 @@ interface PromptEditorProps {
 }
 
 export function PromptEditor({ children, onTextReplace }: PromptEditorProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { selection, clearSelection } = useTextSelection(containerRef);
+  const { selection, clearSelection } = useTextSelection();
   const [showPopup, setShowPopup] = useState(false);
   const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
   const [selectedText, setSelectedText] = useState('');
@@ -48,7 +47,7 @@ export function PromptEditor({ children, onTextReplace }: PromptEditorProps) {
 
   return (
     <>
-      <div ref={containerRef} className="prompt-editor-container">
+      <div className="prompt-editor-container">
         {children}
       </div>
       
