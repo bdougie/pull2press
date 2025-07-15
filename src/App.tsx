@@ -4,7 +4,7 @@ import { HistoryDrawer } from "./components/history-drawer";
 import { supabase } from "./lib/supabase";
 import type { CachedPost } from "./lib/supabase";
 import { Routes, Route, useNavigate } from "react-router-dom";
-import Home from "./pages/Home";
+import HomeEnhanced from "./pages/HomeEnhanced";
 import Edit from "./pages/Edit";
 import Settings from "./pages/Settings";
 
@@ -54,7 +54,7 @@ function App() {
       <div className="flex-grow container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto py-10 px-4">
           <Routes>
-            <Route path="/" element={<Home user={user} />} />
+            <Route path="/" element={<HomeEnhanced user={user} />} />
             <Route path="/edit" element={<Edit user={user} />} />
             <Route path="/edit/:id" element={<Edit user={user} />} />
             <Route path="/settings" element={<Settings user={user} />} />

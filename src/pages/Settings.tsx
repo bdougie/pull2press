@@ -267,7 +267,7 @@ export default function Settings({ user }: { user: any }) {
             <Button 
               onClick={handleSave}
               disabled={isSaving}
-              className="bg-[#2da44e] hover:bg-[#2c974b] text-white"
+              className="bg-brand hover:bg-brand-hover text-white"
             >
               {isSaving ? 'Saving...' : 'Save Preferences'}
             </Button>

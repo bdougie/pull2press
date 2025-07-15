@@ -111,7 +111,7 @@ export default function Home({ user }: { user: any }) {
         <div className="space-y-3">
           <Button
             type="submit"
-            className="bg-[#2da44e] hover:bg-[#2c974b] text-white w-full"
+            className="bg-brand hover:bg-brand-hover text-white w-full"
             disabled={isLoading}
           >
             {isLoading ? "Generating..." : "Generate Blog Post"}
