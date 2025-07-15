@@ -3,10 +3,11 @@ import { AuthButton } from "./components/auth-button";
 import { HistoryDrawer } from "./components/history-drawer";
 import { supabase } from "./lib/supabase";
 import type { CachedPost } from "./lib/supabase";
-import { Routes, Route, useNavigate } from "react-router-dom";
-import Home from "./pages/Home";
+import { Routes, Route, useNavigate, Link } from "react-router-dom";
+import HomeEnhanced from "./pages/HomeEnhanced";
 import Edit from "./pages/Edit";
 import Settings from "./pages/Settings";
+import Loading from "./pages/Loading";
 
 function App() {
   const [user, setUser] = useState<any>(null);
@@ -42,7 +43,9 @@ function App() {
       <nav className="bg-white border-b border-[#d0d7de] px-4 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <h1 className="text-xl font-semibold">pull2press</h1>
+            <Link to="/" className="text-xl font-semibold hover:text-gray-700 transition-colors">
+              pull2press
+            </Link>
           </div>
           <div className="flex items-center space-x-2">
             {user && <HistoryDrawer onSelectPost={handleSelectPost} />}
@@ -54,10 +57,11 @@ function App() {
       <div className="flex-grow container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto py-10 px-4">
           <Routes>
-            <Route path="/" element={<Home user={user} />} />
+            <Route path="/" element={<HomeEnhanced user={user} />} />
             <Route path="/edit" element={<Edit user={user} />} />
             <Route path="/edit/:id" element={<Edit user={user} />} />
             <Route path="/settings" element={<Settings user={user} />} />
+            <Route path="/loading" element={<Loading />} />
           </Routes>
         </div>
       </div>

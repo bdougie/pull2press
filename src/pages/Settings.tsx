@@ -267,7 +267,9 @@ export default function Settings({ user }: { user: any }) {
             <Button 
               onClick={handleSave}
               disabled={isSaving}
-              className="bg-[#2da44e] hover:bg-[#2c974b] text-white"
+              style={{ backgroundColor: '#2da44e', color: 'white' }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2c974b'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2da44e'}
             >
               {isSaving ? 'Saving...' : 'Save Preferences'}
             </Button>

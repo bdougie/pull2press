@@ -111,7 +111,10 @@ export default function Home({ user }: { user: any }) {
         <div className="space-y-3">
           <Button
             type="submit"
-            className="bg-[#2da44e] hover:bg-[#2c974b] text-white w-full"
+            className="w-full"
+            style={{ backgroundColor: '#2da44e', color: 'white' }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2c974b'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2da44e'}
             disabled={isLoading}
           >
             {isLoading ? "Generating..." : "Generate Blog Post"}
