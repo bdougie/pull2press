@@ -1,5 +1,3 @@
-import { OpenAI } from 'openai';
-
 export interface ChatMessage {
   role: 'user' | 'assistant' | 'system';
   content: string;
@@ -23,43 +21,42 @@ export async function* streamPromptResponse(
 ): AsyncGenerator<string, void, unknown> {
   const { maxMessages = 5, systemPrompt = DEFAULT_SYSTEM_PROMPT } = options;
 
-  // Get API key from environment or user preferences
-  const apiKey = localStorage.getItem('openai_api_key') || '';
-  if (!apiKey) {
-    throw new Error('OpenAI API key not found. Please add it in settings.');
-  }
-
-  const openai = new OpenAI({
-    apiKey,
-    dangerouslyAllowBrowser: true
-  });
-
   // Build context from previous messages (limited to last N messages)
   const contextMessages = previousMessages.slice(-maxMessages * 2); // *2 to account for user+assistant pairs
 
-  // Build messages array
-  const messages: ChatMessage[] = [
-    { role: 'system', content: systemPrompt },
-    ...contextMessages,
-    { 
-      role: 'user', 
-      content: `Selected text: "${selectedText}"\n\nInstruction: ${userPrompt}` 
-    }
-  ];
-
   try {
-    const stream = await openai.chat.completions.create({
-      model: 'gpt-4-turbo-preview',
-      messages: messages as any,
-      stream: true,
-      temperature: 0.7,
-      max_tokens: 1000,
+    const response = await fetch('/api/prompt-editor', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        selectedText,
+        userPrompt,
+        previousMessages: contextMessages,
+        systemPrompt,
+      }),
     });
 
-    for await (const chunk of stream) {
-      const content = chunk.choices[0]?.delta?.content;
-      if (content) {
-        yield content;
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to get response');
+    }
+
+    const reader = response.body?.getReader();
+    if (!reader) {
+      throw new Error('No response body');
+    }
+
+    const decoder = new TextDecoder();
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      
+      const chunk = decoder.decode(value);
+      if (chunk) {
+        yield chunk;
       }
     }
   } catch (error) {

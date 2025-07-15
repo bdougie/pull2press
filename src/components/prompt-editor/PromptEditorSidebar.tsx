@@ -99,7 +99,15 @@ export function PromptEditorSidebar({
       setTokenCount(contextRef.current.getTotalTokens());
     } catch (error) {
       console.error('Error generating response:', error);
-      setError(error instanceof Error ? error.message : 'Failed to generate response');
+      let errorMessage = 'Failed to generate response';
+      if (error instanceof Error) {
+        if (error.message.includes('API key')) {
+          errorMessage = 'OpenAI API key not configured on server. Please check your .env file.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      setError(errorMessage);
       setStreamingContent('');
     } finally {
       setIsStreaming(false);

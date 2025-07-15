@@ -19,12 +19,6 @@ This is a demo page to test the AI-powered prompt editor.
 This is a sample paragraph that you can select and improve. It might have some grammatical errors or could be written more clearly. Try selecting this text and using the AI editor to make it better!
 
 Here's another paragraph with some technical content. The prompt editor can help you add code examples, improve clarity, or make the content more concise. Just highlight any portion of this text to get started.
-
-## Note:
-Make sure you have set your OpenAI API key in localStorage:
-\`\`\`javascript
-localStorage.setItem('openai_api_key', 'your-api-key-here')
-\`\`\`
 `);
 
   const handleTextReplace = (originalText: string, newText: string) => {
@@ -58,9 +52,8 @@ localStorage.setItem('openai_api_key', 'your-api-key-here')
       <Card className="border border-[#d0d7de] p-4 bg-[#f6f8fa]">
         <h3 className="font-semibold text-[#24292f] mb-2">Instructions:</h3>
         <ol className="list-decimal list-inside space-y-1 text-sm text-[#57606a]">
-          <li>Make sure you have an OpenAI API key set in localStorage</li>
           <li>Select any text in the editor above</li>
-          <li>The AI Editor popup will appear</li>
+          <li>The AI Editor sidebar will appear from the right</li>
           <li>Choose a preset action or type your own instruction</li>
           <li>Click "Apply" to replace the selected text</li>
         </ol>
