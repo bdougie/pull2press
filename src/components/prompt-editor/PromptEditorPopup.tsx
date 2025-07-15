@@ -22,6 +22,7 @@ const EXAMPLE_PROMPTS = [
   { icon: '📢', label: 'Add CTA', prompt: 'Add a compelling call-to-action' },
   { icon: '💻', label: 'Add code example', prompt: 'Add a relevant code example' },
   { icon: '🎯', label: 'Make concise', prompt: 'Make this more concise while keeping the key points' },
+  { icon: '🔗', label: 'Add GitHub links', prompt: 'Add GitHub links to relevant files mentioned in this text. Use semantic search to find the actual file paths on the default branch and create direct links. If specific files cannot be found, include a link to the PR as fallback. Integrate the links naturally into the text or as a call-to-action.' },
 ];
 
 export function PromptEditorPopup({ 

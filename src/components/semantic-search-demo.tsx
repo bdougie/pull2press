@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Search, Loader2 } from 'lucide-react';
 import { Button } from './ui/button';
-import { Input } from './ui/input';
 import { Card } from './ui/card';
 import { semanticSearch, type SearchResult } from '../lib/semantic-search';
 
@@ -44,13 +43,13 @@ export function SemanticSearchDemo() {
         </p>
         
         <div className="flex gap-2">
-          <Input
+          <input
             type="text"
             placeholder="Search for posts... (e.g., 'performance optimization', 'authentication')"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQuery(e.target.value)}
             onKeyPress={handleKeyPress}
-            className="flex-1"
+            className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <Button
             onClick={handleSearch}

@@ -13,18 +13,18 @@ import {
   type RegenerationPreset,
   type UserPreferences
 } from "../lib/enhanced-prompt-utils";
-import { EnhancedLoadingProgress } from "../components/enhanced-loading-progress";
+import { EnhancedLoadingProgress, EnhancedFetchProgress } from "../components/enhanced-loading-progress";
 
 export default function Edit({ user }: { user: any }) {
   const [blogContent, setBlogContent] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [currentPrUrl, setCurrentPrUrl] = useState<string | null>(null);
   const [postId, setPostId] = useState<string | null>(null);
-  const [progress, setProgress] = useState({
-    stage: 'idle' as 'idle' | 'pr' | 'comments' | 'files' | 'generating',
+  const [progress, setProgress] = useState<EnhancedFetchProgress>({
+    stage: 'pr_details',
     progress: 0,
     message: '',
-    details: null as any
+    details: undefined
   });
   const location = useLocation();
   const navigate = useNavigate();
@@ -90,10 +90,10 @@ export default function Edit({ user }: { user: any }) {
 
     try {
       setProgress({
-        stage: 'pr',
+        stage: 'pr_details',
         progress: 0,
         message: 'Fetching PR data...',
-        details: null
+        details: undefined
       });
       
       const prData = await fetchPRDataEnhanced(currentPrUrl, (progressUpdate) => {
@@ -137,7 +137,7 @@ export default function Edit({ user }: { user: any }) {
         stage: 'generating',
         progress: 90,
         message: 'Generating blog post...',
-        details: null
+        details: undefined
       });
       
       const content = await generateBlogPost(prData, {
@@ -169,10 +169,10 @@ export default function Edit({ user }: { user: any }) {
     } finally {
       setIsLoading(false);
       setProgress({
-        stage: 'idle',
-        progress: 0,
+        stage: 'complete',
+        progress: 100,
         message: '',
-        details: null
+        details: undefined
       });
     }
   };
@@ -182,7 +182,7 @@ export default function Edit({ user }: { user: any }) {
   };
 
   // Show enhanced loading progress when regenerating
-  if (isLoading && progress.stage !== 'idle') {
+  if (isLoading && progress.stage !== 'complete') {
     return <EnhancedLoadingProgress progress={progress} />;
   }
 

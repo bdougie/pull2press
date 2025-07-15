@@ -29,7 +29,6 @@ export default function MarkdownEditor({
 }: MarkdownEditorProps) {
   const [content, setContent] = useState(initialContent);
   const [copied, setCopied] = useState(false);
-  const [showPromptEditor, setShowPromptEditor] = useState(false);
 
   const handleCopy = async () => {
     try {

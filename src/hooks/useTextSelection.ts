@@ -6,7 +6,7 @@ interface SelectionInfo {
   isCollapsed: boolean;
 }
 
-export function useTextSelection(containerRef?: React.RefObject<HTMLElement>) {
+export function useTextSelection() {
   const [selection, setSelection] = useState<SelectionInfo>({
     text: '',
     rect: null,
