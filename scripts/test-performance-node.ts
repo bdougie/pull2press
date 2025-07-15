@@ -109,7 +109,7 @@ async function testPerformance(prUrl: string): Promise<PerformanceMetrics> {
       { role: "system", content: systemPrompt },
       { role: "user", content: userPrompt }
     ],
-    model: "gpt-4-1106-preview",
+    model: "gpt-4o",
     temperature: 0.7,
     max_tokens: 2000,
   });

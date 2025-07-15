@@ -11,6 +11,7 @@ Welcome to the Pull2Press documentation! This guide covers the architecture, aut
 - [Deployment Guide](./deployment.md)
 - [API Reference](./api-reference.md)
 - [Local Development](./local-development.md)
+- [Prompt Editor](./prompt-editor.md) - AI-powered text improvement sidebar
 
 ### Performance & APIs
 - [API Setup Guide](./API_SETUP.md) - GitHub and OpenAI API configuration
@@ -33,6 +34,7 @@ For detailed API setup, see the [API Setup Guide](./API_SETUP.md).
 - **Regeneration Options**: Multiple ways to regenerate content
 - **Authentication**: GitHub OAuth via Supabase Auth
 - **Performance Optimized**: Parallel API calls, visual progress indicators
+- **Prompt Editor**: AI-powered text improvement with real-time suggestions
 
 ## Tech Stack
 

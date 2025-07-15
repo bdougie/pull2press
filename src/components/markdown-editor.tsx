@@ -2,10 +2,11 @@ import { useState } from "react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import { Eye, Edit2, Copy, Check, ExternalLink } from "lucide-react";
+import { Eye, Edit2, Copy, Check, ExternalLink, Sparkles } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { AuthButton } from "./auth-button";
 import RegenerationDropdown from "./regeneration-dropdown";
+import { SimplePromptEditor } from "./prompt-editor/SimplePromptEditor";
 
 interface MarkdownEditorProps {
   initialContent: string;
@@ -39,6 +40,32 @@ export default function MarkdownEditor({
     }
   };
 
+  const handleTextReplace = (originalText: string, newText: string) => {
+    // Replace the selected text with the new text
+    const currentContent = content;
+    const index = currentContent.indexOf(originalText);
+    if (index !== -1) {
+      const before = currentContent.substring(0, index);
+      const after = currentContent.substring(index + originalText.length);
+      setContent(before + newText + after);
+    }
+  };
+
+  const handleAIEditorClick = () => {
+    // Select all text in the textarea
+    const textarea = document.querySelector('textarea');
+    if (textarea) {
+      textarea.select();
+      // Create a selection event to trigger the prompt editor
+      const event = new MouseEvent('mouseup', {
+        bubbles: true,
+        cancelable: true,
+        view: window
+      });
+      textarea.dispatchEvent(event);
+    }
+  };
+
   const getBoltNewUrl = () => {
     const prompt = encodeURIComponent(
       `Create an Astro blog using this markdown content as a blog post:\n\n${content}`
@@ -62,23 +89,38 @@ export default function MarkdownEditor({
               </TabsTrigger>
             </TabsList>
 
-            {onRegenerate && (
-              <RegenerationDropdown
-                onRegenerate={onRegenerate}
-                isRegenerating={isRegenerating || false}
-                user={user}
-              />
-            )}
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={handleAIEditorClick}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2"
+                title="Open AI Editor (selects all text)"
+              >
+                <Sparkles className="h-4 w-4" />
+                AI Editor
+              </Button>
+              
+              {onRegenerate && (
+                <RegenerationDropdown
+                  onRegenerate={onRegenerate}
+                  isRegenerating={isRegenerating || false}
+                  user={user}
+                />
+              )}
+            </div>
           </div>
         </div>
 
         <TabsContent value="edit" className="p-0">
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className="w-full h-[500px] p-4 font-mono text-sm border-none focus:outline-none resize-none"
-            placeholder="Write your blog post in Markdown..."
-          />
+          <SimplePromptEditor onTextReplace={handleTextReplace}>
+            <textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              className="w-full h-[500px] p-4 font-mono text-sm border-none focus:outline-none resize-none"
+              placeholder="Write your blog post in Markdown..."
+            />
+          </SimplePromptEditor>
         </TabsContent>
 
         <TabsContent value="preview" className="p-4">
