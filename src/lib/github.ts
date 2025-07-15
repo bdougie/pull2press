@@ -68,20 +68,60 @@ export async function fetchPRData(prUrl: string) {
     };
   }
   
-  // For unauthenticated users, use server-side API
-  const response = await fetch('/api/generate', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ prUrl }),
-  });
+  // For unauthenticated users, use GitHub's public API (with rate limits)
+  const octokit = new Octokit();
+  const { owner, repo, pull_number } = extractPRInfo(prUrl);
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || 'Failed to fetch PR data');
+  try {
+    // Fetch PR details
+    const { data: pr } = await octokit.rest.pulls.get({
+      owner,
+      repo,
+      pull_number,
+    });
+
+    // Fetch PR commits
+    const { data: commits } = await octokit.rest.pulls.listCommits({
+      owner,
+      repo,
+      pull_number,
+    });
+
+    // Fetch PR files
+    const { data: files } = await octokit.rest.pulls.listFiles({
+      owner,
+      repo,
+      pull_number,
+    });
+
+    return {
+      title: pr.title,
+      description: pr.body || '',
+      commits: commits.map((commit) => ({
+        message: commit.commit.message,
+        sha: commit.sha,
+        url: commit.html_url,
+      })),
+      files: files.map((file) => ({
+        filename: file.filename,
+        status: file.status,
+        additions: file.additions,
+        deletions: file.deletions,
+        changes: file.changes,
+        patch: file.patch,
+      })),
+      author: {
+        login: pr.user?.login || '',
+        avatar: pr.user?.avatar_url || '',
+      },
+      created_at: pr.created_at,
+      updated_at: pr.updated_at,
+    };
+  } catch (error) {
+    console.error('Error fetching PR data:', error);
+    if (error instanceof Error && error.message.includes('rate limit')) {
+      throw new Error('GitHub API rate limit exceeded. Please sign in to continue.');
+    }
+    throw new Error('Failed to fetch PR data. Please check the URL and try again.');
   }
-
-  const data = await response.json();
-  return data.prData;
 }
