@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Card } from '../components/ui/card';
-import { PromptEditor } from '../components/prompt-editor/PromptEditor';
+import { SimplePromptEditor } from '../components/prompt-editor/SimplePromptEditor';
 
 export default function PromptEditorDemo() {
   const [content, setContent] = useState(`# Welcome to the Prompt Editor Demo
@@ -45,14 +45,14 @@ localStorage.setItem('openai_api_key', 'your-api-key-here')
           Select any text in the editor below to activate the AI prompt editor.
         </p>
         
-        <PromptEditor onTextReplace={handleTextReplace}>
+        <SimplePromptEditor onTextReplace={handleTextReplace}>
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
             className="w-full h-[500px] p-4 font-mono text-sm border border-[#d0d7de] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0969da] focus:border-transparent resize-none"
             placeholder="Type or paste your content here..."
           />
-        </PromptEditor>
+        </SimplePromptEditor>
       </Card>
 
       <Card className="border border-[#d0d7de] p-4 bg-[#f6f8fa]">

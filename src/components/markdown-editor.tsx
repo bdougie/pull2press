@@ -6,7 +6,7 @@ import { Eye, Edit2, Copy, Check, ExternalLink } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { AuthButton } from "./auth-button";
 import RegenerationDropdown from "./regeneration-dropdown";
-import { PromptEditor } from "./prompt-editor/PromptEditor";
+import { SimplePromptEditor } from "./prompt-editor/SimplePromptEditor";
 
 interface MarkdownEditorProps {
   initialContent: string;
@@ -85,14 +85,14 @@ export default function MarkdownEditor({
         </div>
 
         <TabsContent value="edit" className="p-0">
-          <PromptEditor onTextReplace={handleTextReplace}>
+          <SimplePromptEditor onTextReplace={handleTextReplace}>
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
               className="w-full h-[500px] p-4 font-mono text-sm border-none focus:outline-none resize-none"
               placeholder="Write your blog post in Markdown..."
             />
-          </PromptEditor>
+          </SimplePromptEditor>
         </TabsContent>
 
         <TabsContent value="preview" className="p-4">
