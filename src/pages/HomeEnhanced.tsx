@@ -158,7 +158,10 @@ export default function HomeEnhanced({ user }: { user: any }) {
             <Button
               type="submit"
               disabled={isLoading}
-              className="bg-brand hover:bg-brand-hover text-white w-full"
+              className="w-full"
+              style={{ backgroundColor: '#2da44e', color: 'white' }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2c974b'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2da44e'}
             >
               {isLoading ? "Processing..." : "Generate Blog Post"}
             </Button>
