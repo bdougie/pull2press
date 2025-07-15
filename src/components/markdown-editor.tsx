@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import { Eye, Edit2, Copy, Check, ExternalLink } from "lucide-react";
+import { Eye, Edit2, Copy, Check, ExternalLink, Sparkles } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { AuthButton } from "./auth-button";
 import RegenerationDropdown from "./regeneration-dropdown";
@@ -29,6 +29,7 @@ export default function MarkdownEditor({
 }: MarkdownEditorProps) {
   const [content, setContent] = useState(initialContent);
   const [copied, setCopied] = useState(false);
+  const [showPromptEditor, setShowPromptEditor] = useState(false);
 
   const handleCopy = async () => {
     try {
@@ -48,6 +49,21 @@ export default function MarkdownEditor({
       const before = currentContent.substring(0, index);
       const after = currentContent.substring(index + originalText.length);
       setContent(before + newText + after);
+    }
+  };
+
+  const handleAIEditorClick = () => {
+    // Select all text in the textarea
+    const textarea = document.querySelector('textarea');
+    if (textarea) {
+      textarea.select();
+      // Create a selection event to trigger the prompt editor
+      const event = new MouseEvent('mouseup', {
+        bubbles: true,
+        cancelable: true,
+        view: window
+      });
+      textarea.dispatchEvent(event);
     }
   };
 
@@ -74,13 +90,26 @@ export default function MarkdownEditor({
               </TabsTrigger>
             </TabsList>
 
-            {onRegenerate && (
-              <RegenerationDropdown
-                onRegenerate={onRegenerate}
-                isRegenerating={isRegenerating || false}
-                user={user}
-              />
-            )}
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={handleAIEditorClick}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2"
+                title="Open AI Editor (selects all text)"
+              >
+                <Sparkles className="h-4 w-4" />
+                AI Editor
+              </Button>
+              
+              {onRegenerate && (
+                <RegenerationDropdown
+                  onRegenerate={onRegenerate}
+                  isRegenerating={isRegenerating || false}
+                  user={user}
+                />
+              )}
+            </div>
           </div>
         </div>
 
