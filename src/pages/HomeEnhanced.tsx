@@ -146,9 +146,6 @@ export default function HomeEnhanced({ user }: { user: any }) {
                 required
                 disabled={isLoading}
               />
-              <p className="mt-1 text-xs text-gray-500">
-                e.g., https://github.com/octocat/hello-world/pull/1
-              </p>
             </div>
             {error && (
               <div className="p-3 bg-red-50 border border-red-200 rounded-md">
