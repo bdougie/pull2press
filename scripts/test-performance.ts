@@ -1,4 +1,4 @@
-import { fetchPRData } from '../src/lib/github';
+import { fetchPRDataOptimized } from '../src/lib/github-optimized';
 import { generateBlogPost } from '../src/lib/openai';
 import { performance } from 'perf_hooks';
 
@@ -17,7 +17,7 @@ async function measurePerformance(prUrl: string): Promise<PerformanceMetrics> {
   // Measure PR data fetching
   console.log('\n📊 Fetching PR data...');
   const startFetch = performance.now();
-  const prData = await fetchPRData(prUrl);
+  const prData = await fetchPRDataOptimized(prUrl);
   const fetchTime = performance.now() - startFetch;
   console.log(`✅ PR data fetched in ${(fetchTime / 1000).toFixed(2)}s`);
   console.log(`   - Title: ${prData.title}`);
