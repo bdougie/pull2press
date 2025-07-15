@@ -1,5 +1,20 @@
-import { supabase } from '../src/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
 import { generateEmbedding, prepareTextForEmbedding } from '../src/lib/embeddings';
+import * as dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
+
+// Initialize Supabase client for Node.js
+// Try both with and without VITE_ prefix
+const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables. Please check your .env file.');
+}
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 /**
  * Generate and store embeddings for blog posts
@@ -74,7 +89,7 @@ async function generateBlogEmbeddings() {
 }
 
 // Run if called directly
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   generateBlogEmbeddings()
     .then(() => process.exit(0))
     .catch(err => {
