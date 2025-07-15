@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { X, Sparkles, Copy, Check, Send, AlertCircle } from 'lucide-react';
+import { X, Sparkles, Copy, Check, Send, AlertCircle, CheckCircle } from 'lucide-react';
 import { Button } from '../ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 import { streamPromptResponse, ConversationContext } from '../../lib/prompt-editor';
 
 interface PromptEditorSidebarProps {
@@ -36,6 +37,7 @@ export function PromptEditorSidebar({
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [tokenCount, setTokenCount] = useState(0);
+  const [lastAssistantMessage, setLastAssistantMessage] = useState<string>('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const contextRef = useRef(new ConversationContext(5));
@@ -94,6 +96,7 @@ export function PromptEditorSidebar({
       
       setMessages(prev => [...prev, assistantMessage]);
       setStreamingContent('');
+      setLastAssistantMessage(fullResponse);
       
       // Update token count
       setTokenCount(contextRef.current.getTotalTokens());
@@ -116,9 +119,9 @@ export function PromptEditorSidebar({
     }
   };
 
-  const handleCopy = (text: string, index: number) => {
+  const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
-    setCopiedIndex(index);
+    setCopiedIndex(-1);
     setTimeout(() => setCopiedIndex(null), 2000);
   };
 
@@ -208,38 +211,6 @@ export function PromptEditorSidebar({
                 }`}>
                   <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                 </div>
-                {message.role === 'assistant' && (
-                  <div className="flex gap-2 mt-1">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => handleCopy(message.content, index)}
-                      className="h-7 text-xs"
-                    >
-                      {copiedIndex === index ? (
-                        <>
-                          <Check className="h-3 w-3 mr-1" />
-                          Copied
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="h-3 w-3 mr-1" />
-                          Copy
-                        </>
-                      )}
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={() => onApply(message.content)}
-                      className="h-7 text-xs"
-                      style={{ backgroundColor: '#2da44e', color: 'white' }}
-                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2c974b'}
-                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2da44e'}
-                    >
-                      Apply
-                    </Button>
-                  </div>
-                )}
               </div>
             ))}
 
@@ -256,6 +227,51 @@ export function PromptEditorSidebar({
 
           {/* Input area */}
           <div className="p-4 border-t border-[#d0d7de]">
+            {/* Action buttons - show only when there's a last assistant message */}
+            {lastAssistantMessage && (
+              <div className="flex gap-1 mb-2">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => handleCopy(lastAssistantMessage)}
+                        className="h-7 w-7"
+                      >
+                        {copiedIndex === -1 ? (
+                          <Check className="h-3.5 w-3.5 text-green-600" />
+                        ) : (
+                          <Copy className="h-3.5 w-3.5" />
+                        )}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{copiedIndex === -1 ? 'Copied!' : 'Copy to clipboard'}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        size="icon"
+                        onClick={() => onApply(lastAssistantMessage)}
+                        className="h-7 w-7"
+                        style={{ backgroundColor: '#2da44e', color: 'white' }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2c974b'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2da44e'}
+                      >
+                        <CheckCircle className="h-3.5 w-3.5" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Apply this suggestion</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+            )}
+            
             <div className="flex gap-2">
               <textarea
                 ref={inputRef}
