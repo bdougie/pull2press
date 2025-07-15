@@ -40,6 +40,8 @@ export function useTextSelection(containerRef?: React.RefObject<HTMLElement>) {
     const range = sel.getRangeAt(0);
     const rect = range.getBoundingClientRect();
 
+    console.log('Text selected:', text, 'Rect:', rect);
+
     setSelection({
       text,
       rect,
@@ -48,19 +50,28 @@ export function useTextSelection(containerRef?: React.RefObject<HTMLElement>) {
   }, [containerRef]);
 
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    
+    const delayedUpdateSelection = () => {
+      // Add a small delay to ensure selection is complete
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(updateSelection, 100);
+    };
+    
     // Listen for selection changes
-    document.addEventListener('selectionchange', updateSelection);
+    document.addEventListener('selectionchange', delayedUpdateSelection);
     
     // Also listen for mouseup to catch selections
-    document.addEventListener('mouseup', updateSelection);
+    document.addEventListener('mouseup', delayedUpdateSelection);
     
     // Listen for keyboard events that might change selection
-    document.addEventListener('keyup', updateSelection);
+    document.addEventListener('keyup', delayedUpdateSelection);
 
     return () => {
-      document.removeEventListener('selectionchange', updateSelection);
-      document.removeEventListener('mouseup', updateSelection);
-      document.removeEventListener('keyup', updateSelection);
+      clearTimeout(timeoutId);
+      document.removeEventListener('selectionchange', delayedUpdateSelection);
+      document.removeEventListener('mouseup', delayedUpdateSelection);
+      document.removeEventListener('keyup', delayedUpdateSelection);
     };
   }, [updateSelection]);
 

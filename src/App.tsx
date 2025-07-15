@@ -8,6 +8,7 @@ import HomeEnhanced from "./pages/HomeEnhanced";
 import Edit from "./pages/Edit";
 import Settings from "./pages/Settings";
 import Loading from "./pages/Loading";
+import PromptEditorDemo from "./pages/PromptEditorDemo";
 
 function App() {
   const [user, setUser] = useState<any>(null);
@@ -62,6 +63,7 @@ function App() {
             <Route path="/edit/:id" element={<Edit user={user} />} />
             <Route path="/settings" element={<Settings user={user} />} />
             <Route path="/loading" element={<Loading />} />
+            <Route path="/prompt-editor-demo" element={<PromptEditorDemo />} />
           </Routes>
         </div>
       </div>

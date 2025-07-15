@@ -16,13 +16,17 @@ export function PromptEditor({ children, onTextReplace }: PromptEditorProps) {
   const [selectedText, setSelectedText] = useState('');
 
   useEffect(() => {
+    console.log('Selection updated:', selection);
     if (selection.text && selection.rect && !selection.isCollapsed) {
       // Calculate popup position based on selection
       const rect = selection.rect;
-      setPopupPosition({
-        top: rect.bottom + window.scrollY + 10,
-        left: rect.left + window.scrollX + (rect.width / 2) - 200, // Center the popup
-      });
+      // Since we're using fixed positioning, we don't need to add scroll offsets
+      const position = {
+        top: rect.bottom + 10,
+        left: Math.max(10, rect.left + (rect.width / 2) - 200), // Center the popup, ensure it's not off-screen
+      };
+      console.log('Showing popup at position:', position);
+      setPopupPosition(position);
       setSelectedText(selection.text);
       setShowPopup(true);
     } else {
