@@ -25,7 +25,12 @@ export async function* streamPromptResponse(
   const contextMessages = previousMessages.slice(-maxMessages * 2); // *2 to account for user+assistant pairs
 
   try {
-    const response = await fetch('/api/prompt-editor', {
+    // Get Supabase URL from environment
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    if (!supabaseUrl) {
+      throw new Error('Supabase URL not configured');
+    }
+    const response = await fetch(`${supabaseUrl}/functions/v1/prompt-editor`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
