@@ -115,7 +115,7 @@ export default function MarkdownEditor({
               )}
             </Button>
             <a href={getBoltNewUrl()} target="_blank" rel="noopener noreferrer">
-              <Button className="bg-brand hover:bg-brand-hover text-white flex items-center gap-2">
+              <Button className="flex items-center gap-2">
                 <ExternalLink className="h-4 w-4" />
                 Create Astro Blog
               </Button>

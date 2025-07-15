@@ -3,7 +3,7 @@ import { AuthButton } from "./components/auth-button";
 import { HistoryDrawer } from "./components/history-drawer";
 import { supabase } from "./lib/supabase";
 import type { CachedPost } from "./lib/supabase";
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route, useNavigate, Link } from "react-router-dom";
 import HomeEnhanced from "./pages/HomeEnhanced";
 import Edit from "./pages/Edit";
 import Settings from "./pages/Settings";
@@ -42,7 +42,9 @@ function App() {
       <nav className="bg-white border-b border-[#d0d7de] px-4 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <h1 className="text-xl font-semibold">pull2press</h1>
+            <Link to="/" className="text-xl font-semibold hover:text-gray-700 transition-colors">
+              pull2press
+            </Link>
           </div>
           <div className="flex items-center space-x-2">
             {user && <HistoryDrawer onSelectPost={handleSelectPost} />}
