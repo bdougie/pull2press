@@ -17,6 +17,7 @@ Pull2Press is a tool that converts GitHub pull requests into publishable content
 - npm
 - GitHub account with personal access token
 - OpenAI API key
+- Supabase project (for authentication and edge functions)
 
 ## Local Setup
 
@@ -33,17 +34,25 @@ Pull2Press is a tool that converts GitHub pull requests into publishable content
 
 3. Create a `.env` file in the root directory with the following variables:
    ```
-   GITHUB_TOKEN=your_github_personal_access_token
+   VITE_SUPABASE_URL=your_supabase_project_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   VITE_GITHUB_TOKEN=your_github_personal_access_token
    OPENAI_API_KEY=your_openai_api_key
-   NEXT_PUBLIC_BASE_URL=http://localhost:3000
    ```
 
-4. Start the development server:
+4. Configure Supabase Edge Function environment variables:
+   - Go to your Supabase project dashboard
+   - Navigate to Edge Functions settings
+   - Add the `OPENAI_API_KEY` environment variable with your OpenAI API key
+   
+   Note: The `prompt-editor` edge function requires the OPENAI_API_KEY to be set in Supabase's environment variables, not just in your local .env file.
+
+5. Start the development server:
    ```bash
    npm run dev
    ```
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser.
+6. Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ## Testing
 

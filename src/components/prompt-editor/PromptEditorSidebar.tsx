@@ -103,6 +103,8 @@ export function PromptEditorSidebar({
       if (error instanceof Error) {
         if (error.message.includes('API key')) {
           errorMessage = 'OpenAI API key not configured on server. Please check your .env file.';
+        } else if (error.message.includes('Failed to fetch')) {
+          errorMessage = 'Unable to connect to the Supabase edge function. The OPENAI_API_KEY may need to be set in Supabase Edge Function environment variables.';
         } else {
           errorMessage = error.message;
         }
