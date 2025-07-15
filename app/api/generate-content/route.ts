@@ -28,7 +28,7 @@ export async function POST(req: Request) {
         { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt }
       ],
-      model: "gpt-4-1106-preview",
+      model: "gpt-4o",
       temperature,
       max_tokens: 2000,
     });

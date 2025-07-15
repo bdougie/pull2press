@@ -49,7 +49,7 @@ Maintain the original tone and style unless specifically asked to change it.`
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4-turbo-preview',
+        model: 'gpt-4o',
         messages,
         stream: true,
         temperature: 0.7,

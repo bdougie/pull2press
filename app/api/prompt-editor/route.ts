@@ -31,7 +31,7 @@ Maintain the original tone and style unless specifically asked to change it.` },
     ];
 
     const stream = await openai.chat.completions.create({
-      model: 'gpt-4-turbo-preview',
+      model: 'gpt-4o',
       messages: messages as any,
       stream: true,
       temperature: 0.7,
