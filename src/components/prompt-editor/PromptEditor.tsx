@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useTextSelection } from '../../hooks/useTextSelection';
+import { useTextSelectionFixed } from '../../hooks/useTextSelectionFixed';
 import { PromptEditorPopup } from './PromptEditorPopup';
 import { createPortal } from 'react-dom';
 
@@ -9,7 +9,7 @@ interface PromptEditorProps {
 }
 
 export function PromptEditor({ children, onTextReplace }: PromptEditorProps) {
-  const { selection, clearSelection } = useTextSelection();
+  const { selection, clearSelection } = useTextSelectionFixed();
   const [showPopup, setShowPopup] = useState(false);
   const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
   const [selectedText, setSelectedText] = useState('');

@@ -115,8 +115,6 @@ export function AuthButton() {
       ? `https://github.com/${githubUsername}.png`
       : null;
 
-    console.log("User metadata:", user.user_metadata); // Debug user metadata
-
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
