@@ -185,21 +185,6 @@ export function PromptEditorSidebar({
 
           {/* Messages area */}
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
-            {messages.length === 0 && !isStreaming && (
-              <div className="space-y-2">
-                <p className="text-sm text-[#57606a] mb-3">Choose an action or type your own:</p>
-                {EXAMPLE_PROMPTS.map((prompt, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handlePromptClick(prompt.prompt)}
-                    className="w-full text-left p-2 rounded-md border border-[#d0d7de] hover:bg-[#f6f8fa] transition-colors"
-                  >
-                    <span className="mr-2">{prompt.icon}</span>
-                    <span className="text-sm text-[#24292f]">{prompt.label}</span>
-                  </button>
-                ))}
-              </div>
-            )}
 
             {messages.map((message, index) => (
               <div key={index} className={`space-y-1 ${message.role === 'user' ? 'text-right' : ''}`}>
@@ -225,37 +210,55 @@ export function PromptEditorSidebar({
           </div>
 
           {/* Input area */}
-          <div className="p-4 border-t border-[#d0d7de]">
-            {/* Action buttons - show only when there's a last assistant message */}
-            {lastAssistantMessage && (
-              <div className="flex gap-1 mb-2">
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  onClick={() => handleCopy(lastAssistantMessage)}
-                  className="h-7 w-7"
-                  title={copiedIndex === -1 ? 'Copied!' : 'Copy to clipboard'}
-                >
-                  {copiedIndex === -1 ? (
-                    <Check className="h-3.5 w-3.5 text-green-600" />
-                  ) : (
-                    <Copy className="h-3.5 w-3.5" />
-                  )}
-                </Button>
-                
-                <Button
-                  size="icon"
-                  onClick={() => onApply(lastAssistantMessage)}
-                  className="h-7 w-7"
-                  title="Apply this suggestion"
-                  style={{ backgroundColor: '#2da44e', color: 'white' }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2c974b'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2da44e'}
-                >
-                  <CheckCircle className="h-3.5 w-3.5" />
-                </Button>
+          <div className="border-t border-[#d0d7de]">
+            {/* Example prompts */}
+            <div className="p-3 border-b border-[#d0d7de] bg-[#f6f8fa]">
+              <div className="flex gap-1.5 flex-wrap">
+                {EXAMPLE_PROMPTS.map((prompt, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handlePromptClick(prompt.prompt)}
+                    className="text-xs px-2 py-1 rounded-md border border-[#d0d7de] bg-white hover:bg-[#f6f8fa] transition-colors flex items-center gap-1"
+                    disabled={isStreaming}
+                  >
+                    <span>{prompt.icon}</span>
+                    <span className="text-[#24292f]">{prompt.label}</span>
+                  </button>
+                ))}
               </div>
-            )}
+            </div>
+
+            <div className="p-4">
+              {/* Action buttons - show only when there's a last assistant message */}
+              {lastAssistantMessage && (
+                <div className="flex gap-1 mb-2">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => handleCopy(lastAssistantMessage)}
+                    className="h-7 w-7"
+                    title={copiedIndex === -1 ? 'Copied!' : 'Copy to clipboard'}
+                  >
+                    {copiedIndex === -1 ? (
+                      <Check className="h-3.5 w-3.5 text-green-600" />
+                    ) : (
+                      <Copy className="h-3.5 w-3.5" />
+                    )}
+                  </Button>
+                  
+                  <Button
+                    size="icon"
+                    onClick={() => onApply(lastAssistantMessage)}
+                    className="h-7 w-7"
+                    title="Apply this suggestion"
+                    style={{ backgroundColor: '#2da44e', color: 'white' }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2c974b'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2da44e'}
+                  >
+                    <CheckCircle className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+              )}
             
             <div className="flex gap-2">
               <textarea
@@ -279,6 +282,7 @@ export function PromptEditorSidebar({
               >
                 <Send className="h-4 w-4" />
               </Button>
+            </div>
             </div>
           </div>
         </div>
