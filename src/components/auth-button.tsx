@@ -112,7 +112,7 @@ export function AuthButton() {
       user.user_metadata?.preferred_username ||
       user.user_metadata?.login;
     const avatarUrl = githubUsername
-      ? `https://github.com/${githubUsername}.png`
+      ? `https://avatars.githubusercontent.com/${githubUsername}`
       : null;
 
     return (
