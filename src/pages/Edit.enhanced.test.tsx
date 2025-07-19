@@ -41,7 +41,7 @@ describe('Edit Page - Enhanced Features', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.useFakeTimers();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
   });
 
   afterEach(() => {
@@ -65,7 +65,7 @@ describe('Edit Page - Enhanced Features', () => {
       
       vi.mocked(supabase.from).mockImplementation(mockFrom);
       
-      const user = userEvent.setup({ delay: null });
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
       
       render(
         <MemoryRouter initialEntries={['/edit/post-123']}>
@@ -85,7 +85,7 @@ describe('Edit Page - Enhanced Features', () => {
       await user.type(editor, 'Updated content');
       
       // Fast forward 1.5 seconds
-      vi.advanceTimersByTime(1500);
+      await vi.advanceTimersByTimeAsync(1500);
       
       await waitFor(() => {
         expect(mockUpdate).toHaveBeenCalledWith({
@@ -114,7 +114,7 @@ describe('Edit Page - Enhanced Features', () => {
       
       vi.mocked(supabase.from).mockImplementation(mockFrom);
       
-      const user = userEvent.setup({ delay: null });
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
       
       render(
         <MemoryRouter initialEntries={['/edit/post-123']}>
@@ -133,7 +133,7 @@ describe('Edit Page - Enhanced Features', () => {
       await user.type(editor, ' new');
       
       // Fast forward to trigger save
-      vi.advanceTimersByTime(1500);
+      await vi.advanceTimersByTimeAsync(1500);
       
       // Should show saving status
       await waitFor(() => {
@@ -141,7 +141,7 @@ describe('Edit Page - Enhanced Features', () => {
       });
       
       // Complete the save
-      vi.advanceTimersByTime(100);
+      await vi.advanceTimersByTimeAsync(100);
       
       await waitFor(() => {
         expect(screen.getByTestId('save-status')).toHaveTextContent('saved');
@@ -164,7 +164,7 @@ describe('Edit Page - Enhanced Features', () => {
       
       vi.mocked(supabase.from).mockImplementation(mockFrom);
       
-      const user = userEvent.setup({ delay: null });
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
       
       render(
         <MemoryRouter initialEntries={['/edit/post-123']}>
@@ -182,16 +182,16 @@ describe('Edit Page - Enhanced Features', () => {
       
       // Type multiple times rapidly
       await user.type(editor, 'a');
-      vi.advanceTimersByTime(500);
+      await vi.advanceTimersByTimeAsync(500);
       await user.type(editor, 'b');
-      vi.advanceTimersByTime(500);
+      await vi.advanceTimersByTimeAsync(500);
       await user.type(editor, 'c');
       
       // Should not have saved yet
       expect(mockUpdate).not.toHaveBeenCalled();
       
       // Fast forward to complete debounce
-      vi.advanceTimersByTime(1000);
+      await vi.advanceTimersByTimeAsync(1000);
       
       // Should save only once with final content
       await waitFor(() => {

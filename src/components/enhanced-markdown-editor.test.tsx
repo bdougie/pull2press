@@ -28,13 +28,18 @@ describe('EnhancedMarkdownEditor', () => {
         />
       );
 
-      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+      const textarea = screen.getByPlaceholderText(/Write your blog post in Markdown/) as HTMLTextAreaElement;
       
       // Select "world"
+      textarea.focus();
       textarea.setSelectionRange(6, 11);
       
-      // Press Cmd+B
-      await user.keyboard('{Meta>}b{/Meta}');
+      // Press Cmd+B on the textarea
+      fireEvent.keyDown(textarea, {
+        key: 'b',
+        metaKey: true,
+        bubbles: true
+      });
       
       expect(mockOnChange).toHaveBeenCalledWith('hello **world**');
     });
@@ -48,13 +53,18 @@ describe('EnhancedMarkdownEditor', () => {
         />
       );
 
-      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+      const textarea = screen.getByPlaceholderText(/Write your blog post in Markdown/) as HTMLTextAreaElement;
       
       // Select "hello"
+      textarea.focus();
       textarea.setSelectionRange(0, 5);
       
-      // Press Cmd+I
-      await user.keyboard('{Meta>}i{/Meta}');
+      // Press Cmd+I on the textarea
+      fireEvent.keyDown(textarea, {
+        key: 'i',
+        metaKey: true,
+        bubbles: true
+      });
       
       expect(mockOnChange).toHaveBeenCalledWith('*hello* world');
     });
@@ -68,13 +78,18 @@ describe('EnhancedMarkdownEditor', () => {
         />
       );
 
-      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+      const textarea = screen.getByPlaceholderText(/Write your blog post in Markdown/) as HTMLTextAreaElement;
       
       // Select "GitHub"
+      textarea.focus();
       textarea.setSelectionRange(10, 16);
       
-      // Press Cmd+K
-      await user.keyboard('{Meta>}k{/Meta}');
+      // Press Cmd+K on the textarea
+      fireEvent.keyDown(textarea, {
+        key: 'k',
+        metaKey: true,
+        bubbles: true
+      });
       
       expect(mockOnChange).toHaveBeenCalledWith('Check out [GitHub](url)');
     });
@@ -88,13 +103,18 @@ describe('EnhancedMarkdownEditor', () => {
         />
       );
 
-      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+      const textarea = screen.getByPlaceholderText(/Write your blog post in Markdown/) as HTMLTextAreaElement;
       
       // Position cursor at end
+      textarea.focus();
       textarea.setSelectionRange(6, 6);
       
-      // Press Cmd+K
-      await user.keyboard('{Meta>}k{/Meta}');
+      // Press Cmd+K on the textarea
+      fireEvent.keyDown(textarea, {
+        key: 'k',
+        metaKey: true,
+        bubbles: true
+      });
       
       expect(mockOnChange).toHaveBeenCalledWith('Hello [](url)');
     });
@@ -108,13 +128,18 @@ describe('EnhancedMarkdownEditor', () => {
         />
       );
 
-      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+      const textarea = screen.getByPlaceholderText(/Write your blog post in Markdown/) as HTMLTextAreaElement;
       
       // Select "console.log"
+      textarea.focus();
       textarea.setSelectionRange(8, 19);
       
-      // Press Alt+`
-      await user.keyboard('{Alt>}`{/Alt}');
+      // Press Alt+` on the textarea
+      fireEvent.keyDown(textarea, {
+        key: '`',
+        altKey: true,
+        bubbles: true
+      });
       
       expect(mockOnChange).toHaveBeenCalledWith('Use the `console.log` function');
     });
@@ -132,7 +157,7 @@ describe('EnhancedMarkdownEditor', () => {
         />
       );
 
-      const dropZone = screen.getByRole('textbox').parentElement!;
+      const dropZone = screen.getByPlaceholderText(/Write your blog post in Markdown/).parentElement!;
       const file = new File(['image'], 'test.jpg', { type: 'image/jpeg' });
       
       // Simulate drag over
@@ -171,7 +196,7 @@ describe('EnhancedMarkdownEditor', () => {
         />
       );
 
-      const dropZone = screen.getByRole('textbox').parentElement!;
+      const dropZone = screen.getByPlaceholderText(/Write your blog post in Markdown/).parentElement!;
       const file = new File(['document'], 'test.pdf', { type: 'application/pdf' });
       
       fireEvent.drop(dropZone, {
@@ -201,7 +226,7 @@ describe('EnhancedMarkdownEditor', () => {
         />
       );
 
-      const textarea = screen.getByRole('textbox');
+      const textarea = screen.getByPlaceholderText(/Write your blog post in Markdown/);
       const file = new File(['image'], 'image.png', { type: 'image/png' });
       
       fireEvent.paste(textarea, {
@@ -230,7 +255,7 @@ describe('EnhancedMarkdownEditor', () => {
         />
       );
 
-      const dropZone = screen.getByRole('textbox').parentElement!;
+      const dropZone = screen.getByPlaceholderText(/Write your blog post in Markdown/).parentElement!;
       const file = new File(['image'], 'test.jpg', { type: 'image/jpeg' });
       
       fireEvent.drop(dropZone, {
@@ -321,7 +346,7 @@ describe('EnhancedMarkdownEditor', () => {
         />
       );
       
-      const textarea = screen.getByRole('textbox');
+      const textarea = screen.getByPlaceholderText(/Write your blog post in Markdown/) as HTMLTextAreaElement;
       await user.type(textarea, ' World');
       
       expect(mockOnChange).toHaveBeenLastCalledWith('Hello World');
