@@ -51,12 +51,7 @@ export default function HomeOptimized({ user }: { user: any }) {
           // Small delay for user to see the complete state
           await new Promise(resolve => setTimeout(resolve, 500));
           
-          navigate(`/edit`, { 
-            state: { 
-              content: existingPosts.content,
-              prUrl: prUrl 
-            } 
-          });
+          navigate(`/edit/${existingPosts.id}`);
           return;
         }
       }
@@ -79,18 +74,23 @@ export default function HomeOptimized({ user }: { user: any }) {
       });
 
       // If user is logged in, save to Supabase
+      let postId = null;
       if (user) {
-        const { error: saveError } = await supabase
+        const { data: savedPost, error: saveError } = await supabase
           .from("cached_posts")
           .insert({
             pr_url: prUrl,
             content,
             title: prData.title,
             user_id: user.id,
-          });
+          })
+          .select()
+          .single();
 
         if (saveError) {
           console.error("Error saving post:", saveError);
+        } else if (savedPost) {
+          postId = savedPost.id;
         }
       }
 
@@ -104,12 +104,17 @@ export default function HomeOptimized({ user }: { user: any }) {
       await new Promise(resolve => setTimeout(resolve, 500));
 
       // Navigate to edit page with content
-      navigate(`/edit`, { 
-        state: { 
-          content: content,
-          prUrl: prUrl 
-        } 
-      });
+      if (postId) {
+        navigate(`/edit/${postId}`);
+      } else {
+        // If not saved (user not logged in or error), navigate with state
+        navigate(`/edit`, { 
+          state: { 
+            content: content,
+            prUrl: prUrl 
+          } 
+        });
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
       setIsLoading(false);

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import EnhancedMarkdownEditor from "../components/enhanced-markdown-editor";
 import { generateBlogPost } from "../lib/openai";
 import { fetchPRDataEnhanced } from "../lib/github-enhanced";
@@ -20,6 +20,7 @@ export default function Edit({ user }: { user: any }) {
   const [isLoading, setIsLoading] = useState(false);
   const [currentPrUrl, setCurrentPrUrl] = useState<string | null>(null);
   const [postId, setPostId] = useState<string | null>(null);
+  const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'error' | null>(null);
   const [progress, setProgress] = useState<EnhancedFetchProgress>({
     stage: 'pr_details',
     progress: 0,
@@ -29,6 +30,7 @@ export default function Edit({ user }: { user: any }) {
   const location = useLocation();
   const navigate = useNavigate();
   const params = useParams<{ id?: string }>();
+  const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const fetchPostById = async (id: string) => {
@@ -63,22 +65,66 @@ export default function Edit({ user }: { user: any }) {
       }
     };
 
+    const createNewDraft = async (content: string, prUrl: string) => {
+      if (!user) {
+        // If no user, just set the content without saving
+        setBlogContent(content);
+        setCurrentPrUrl(prUrl);
+        return;
+      }
+
+      try {
+        // Create a new draft post
+        const { data, error } = await supabase
+          .from("cached_posts")
+          .insert({
+            pr_url: prUrl,
+            title: "Draft",
+            content: content,
+            user_id: user.id,
+            is_draft: true
+          })
+          .select()
+          .single();
+
+        if (error) {
+          console.error("Error creating draft:", error);
+          // Still set the content even if save fails
+          setBlogContent(content);
+          setCurrentPrUrl(prUrl);
+          return;
+        }
+
+        if (data) {
+          // Navigate to the edit page with the new ID
+          navigate(`/edit/${data.id}`, { replace: true });
+          setBlogContent(data.content);
+          setCurrentPrUrl(data.pr_url);
+          setPostId(data.id);
+        }
+      } catch (err) {
+        console.error("Error creating draft:", err);
+        setBlogContent(content);
+        setCurrentPrUrl(prUrl);
+      }
+    };
+
     // Check if we have an ID in the URL
     if (params.id) {
       fetchPostById(params.id);
     } else {
-      // If no ID, try to get from location state (old method)
+      // If no ID, check location state
       const state = location.state as { content: string; prUrl: string } | null;
 
-      if (state?.content) {
-        setBlogContent(state.content);
-        setCurrentPrUrl(state.prUrl);
+      if (state?.content && state?.prUrl) {
+        // Create a new draft with the provided content
+        createNewDraft(state.content, state.prUrl);
       } else {
-        // If there's no content or ID, redirect back to home
+        // No content or ID, redirect to home
         navigate("/");
       }
     }
-  }, [params.id, location, navigate]);
+  }, [params.id, location, navigate, user]);
 
   const handleRegenerate = async (options?: {
     preset?: RegenerationPreset;
@@ -181,6 +227,60 @@ export default function Edit({ user }: { user: any }) {
     navigate("/");
   };
 
+  // Auto-save functionality
+  const saveContent = useCallback(async (content: string) => {
+    if (!user || !postId) return;
+    
+    setSaveStatus('saving');
+    
+    try {
+      const { error } = await supabase
+        .from("cached_posts")
+        .update({ 
+          content,
+          is_draft: true,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", postId);
+
+      if (error) {
+        console.error("Error saving draft:", error);
+        setSaveStatus('error');
+      } else {
+        setSaveStatus('saved');
+        // Clear save status after 2 seconds
+        setTimeout(() => setSaveStatus(null), 2000);
+      }
+    } catch (err) {
+      console.error("Error saving draft:", err);
+      setSaveStatus('error');
+    }
+  }, [user, postId]);
+
+  // Handle content changes with debouncing
+  const handleContentChange = useCallback((newContent: string) => {
+    setBlogContent(newContent);
+    
+    // Clear existing timer
+    if (saveTimerRef.current) {
+      clearTimeout(saveTimerRef.current);
+    }
+    
+    // Set new timer for auto-save (1.5 seconds after user stops typing)
+    saveTimerRef.current = setTimeout(() => {
+      saveContent(newContent);
+    }, 1500);
+  }, [saveContent]);
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (saveTimerRef.current) {
+        clearTimeout(saveTimerRef.current);
+      }
+    };
+  }, []);
+
   // Show enhanced loading progress when regenerating
   if (isLoading && progress.stage !== 'complete') {
     return <EnhancedLoadingProgress progress={progress} />;
@@ -214,6 +314,8 @@ export default function Edit({ user }: { user: any }) {
         isRegenerating={isLoading}
         showSignInPrompt={!user}
         user={user}
+        onChange={handleContentChange}
+        saveStatus={saveStatus}
       />
     </div>
   );

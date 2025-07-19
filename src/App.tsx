@@ -32,12 +32,7 @@ function App() {
   }, []);
 
   const handleSelectPost = (post: CachedPost) => {
-    navigate("/edit", {
-      state: {
-        content: post.content,
-        prUrl: post.pr_url,
-      },
-    });
+    navigate(`/edit/${post.id}`);
   };
 
   return (

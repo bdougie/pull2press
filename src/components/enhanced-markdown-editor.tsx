@@ -2,7 +2,7 @@ import { useState, useRef, DragEvent } from "react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import { Eye, Edit2, Copy, Check, ExternalLink, Sparkles, Upload, HelpCircle } from "lucide-react";
+import { Eye, Edit2, Copy, Check, ExternalLink, Sparkles, Upload, HelpCircle, Cloud, CloudOff } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { AuthButton } from "./auth-button";
 import RegenerationDropdown from "./regeneration-dropdown";
@@ -27,6 +27,8 @@ interface EnhancedMarkdownEditorProps {
   isRegenerating?: boolean;
   showSignInPrompt?: boolean;
   user?: any;
+  onChange?: (content: string) => void;
+  saveStatus?: 'saved' | 'saving' | 'error' | null;
 }
 
 export default function EnhancedMarkdownEditor({
@@ -35,8 +37,16 @@ export default function EnhancedMarkdownEditor({
   isRegenerating,
   showSignInPrompt,
   user,
+  onChange,
+  saveStatus,
 }: EnhancedMarkdownEditorProps) {
   const [content, setContent] = useState(initialContent);
+
+  // Update parent when content changes
+  const updateContent = (newContent: string) => {
+    setContent(newContent);
+    onChange?.(newContent);
+  };
   const [copied, setCopied] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -60,7 +70,7 @@ export default function EnhancedMarkdownEditor({
     if (index !== -1) {
       const before = currentContent.substring(0, index);
       const after = currentContent.substring(index + originalText.length);
-      setContent(before + newText + after);
+      updateContent(before + newText + after);
     }
   };
 
@@ -97,7 +107,7 @@ export default function EnhancedMarkdownEditor({
     const afterContent = content.substring(end);
     
     const newContent = beforeContent + before + selectedText + after + afterContent;
-    setContent(newContent);
+    updateContent(newContent);
     
     // Set cursor position
     setTimeout(() => {
@@ -122,7 +132,7 @@ export default function EnhancedMarkdownEditor({
     const after = content.substring(end);
     
     const newContent = before + text + after;
-    setContent(newContent);
+    updateContent(newContent);
     
     // Reset cursor position after React re-renders
     setTimeout(() => {
@@ -238,7 +248,7 @@ export default function EnhancedMarkdownEditor({
             const before = content.substring(0, start);
             const after = content.substring(end);
             const newContent = before + linkMarkdown + after;
-            setContent(newContent);
+            updateContent(newContent);
             
             // Set cursor position inside the url placeholder
             setTimeout(() => {
@@ -254,7 +264,7 @@ export default function EnhancedMarkdownEditor({
             const before = content.substring(0, start);
             const after = content.substring(start);
             const newContent = before + linkMarkdown + after;
-            setContent(newContent);
+            updateContent(newContent);
             
             // Position cursor inside the square brackets
             setTimeout(() => {
@@ -307,6 +317,29 @@ export default function EnhancedMarkdownEditor({
             </TabsList>
 
             <div className="flex items-center gap-2">
+              {saveStatus && (
+                <div className="flex items-center gap-1 text-sm">
+                  {saveStatus === 'saving' && (
+                    <>
+                      <div className="animate-spin h-3 w-3 border-2 border-gray-400 border-t-transparent rounded-full"></div>
+                      <span className="text-gray-600">Saving...</span>
+                    </>
+                  )}
+                  {saveStatus === 'saved' && (
+                    <>
+                      <Cloud className="h-4 w-4 text-green-600" />
+                      <span className="text-green-600">Saved</span>
+                    </>
+                  )}
+                  {saveStatus === 'error' && (
+                    <>
+                      <CloudOff className="h-4 w-4 text-red-600" />
+                      <span className="text-red-600">Error saving</span>
+                    </>
+                  )}
+                </div>
+              )}
+              
               <Button
                 onClick={handleAIEditorClick}
                 variant="outline"
@@ -359,7 +392,7 @@ export default function EnhancedMarkdownEditor({
               <textarea
                 ref={textareaRef}
                 value={content}
-                onChange={(e) => setContent(e.target.value)}
+                onChange={(e) => updateContent(e.target.value)}
                 onKeyDown={handleKeyDown}
                 onPaste={handlePaste}
                 className="w-full h-[500px] p-4 font-mono text-sm border-none focus:outline-none resize-none"
