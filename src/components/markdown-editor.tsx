@@ -52,15 +52,15 @@ export default function MarkdownEditor({
   };
 
   const handleAIEditorClick = () => {
-    // Select all text in the textarea
+    // Trigger cmd+j to open the AI editor
     const textarea = document.querySelector('textarea');
     if (textarea) {
-      textarea.select();
-      // Create a selection event to trigger the prompt editor
-      const event = new MouseEvent('mouseup', {
+      const event = new KeyboardEvent('keydown', {
+        key: 'j',
+        metaKey: true,
+        ctrlKey: false,
         bubbles: true,
-        cancelable: true,
-        view: window
+        cancelable: true
       });
       textarea.dispatchEvent(event);
     }
@@ -95,7 +95,7 @@ export default function MarkdownEditor({
                 variant="outline"
                 size="sm"
                 className="flex items-center gap-2"
-                title="Open AI Editor (selects all text)"
+                title="Open AI Editor (Cmd+J)"
               >
                 <Sparkles className="h-4 w-4" />
                 AI Editor
