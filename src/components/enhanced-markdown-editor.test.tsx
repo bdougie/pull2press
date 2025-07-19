@@ -20,7 +20,6 @@ describe('EnhancedMarkdownEditor', () => {
 
   describe('Markdown Shortcuts', () => {
     it('should make text bold with cmd+b', async () => {
-      const user = userEvent.setup();
       render(
         <EnhancedMarkdownEditor
           initialContent="hello world"
@@ -45,7 +44,6 @@ describe('EnhancedMarkdownEditor', () => {
     });
 
     it('should make text italic with cmd+i', async () => {
-      const user = userEvent.setup();
       render(
         <EnhancedMarkdownEditor
           initialContent="hello world"
@@ -70,7 +68,6 @@ describe('EnhancedMarkdownEditor', () => {
     });
 
     it('should insert link syntax with cmd+k when text is selected', async () => {
-      const user = userEvent.setup();
       render(
         <EnhancedMarkdownEditor
           initialContent="Check out GitHub"
@@ -95,7 +92,6 @@ describe('EnhancedMarkdownEditor', () => {
     });
 
     it('should insert empty link syntax with cmd+k when no text is selected', async () => {
-      const user = userEvent.setup();
       render(
         <EnhancedMarkdownEditor
           initialContent="Hello "
@@ -120,7 +116,6 @@ describe('EnhancedMarkdownEditor', () => {
     });
 
     it('should make text inline code with alt+backtick', async () => {
-      const user = userEvent.setup();
       render(
         <EnhancedMarkdownEditor
           initialContent="Use the console.log function"

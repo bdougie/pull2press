@@ -87,7 +87,6 @@ describe('SimplePromptEditor', () => {
     });
 
     it('should work with ctrl+j on Windows/Linux', async () => {
-      const user = userEvent.setup();
       
       render(
         <SimplePromptEditor onTextReplace={mockOnTextReplace}>
@@ -154,7 +153,6 @@ describe('SimplePromptEditor', () => {
       );
 
       const container = screen.getByText(/Hello world/).closest('.prompt-editor-container');
-      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
       
       // Mock getSelection
       const mockSelection = {
@@ -194,7 +192,6 @@ describe('SimplePromptEditor', () => {
       );
 
       const container = screen.getByText(/Hello world/).closest('.prompt-editor-container');
-      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
       
       // Mock selection
       const mockSelection = {
