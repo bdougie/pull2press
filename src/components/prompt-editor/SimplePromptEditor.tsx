@@ -14,17 +14,15 @@ export function SimplePromptEditor({ children, onTextReplace }: SimplePromptEdit
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleMouseUp = () => {
-      // Small delay to let selection settle
-      setTimeout(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check for Cmd+J (Mac) or Ctrl+J (Windows/Linux)
+      if ((e.metaKey || e.ctrlKey) && e.key === 'j') {
+        e.preventDefault();
+        
         const selection = window.getSelection();
         const text = selection?.toString().trim();
         
-        console.log('Mouse up - checking selection:', text);
-        
         if (text && text.length > 0) {
-          console.log('Selection found:', text);
-          
           // Check if all text is selected
           const textarea = containerRef.current?.querySelector('textarea');
           const isAll = textarea && textarea.value.trim() === text;
@@ -32,20 +30,28 @@ export function SimplePromptEditor({ children, onTextReplace }: SimplePromptEdit
           setSelectedText(text);
           setIsAllTextSelected(isAll || false);
           setShowSidebar(true);
+        } else {
+          // If no text is selected, select all text and open the editor
+          const textarea = containerRef.current?.querySelector('textarea') as HTMLTextAreaElement;
+          if (textarea) {
+            textarea.select();
+            setSelectedText(textarea.value.trim());
+            setIsAllTextSelected(true);
+            setShowSidebar(true);
+          }
         }
-      }, 100);
+      }
     };
 
     // Add event listener to the container
     const container = containerRef.current;
     if (container) {
-      container.addEventListener('mouseup', handleMouseUp);
-      console.log('Event listener added to container');
+      container.addEventListener('keydown', handleKeyDown);
     }
 
     return () => {
       if (container) {
-        container.removeEventListener('mouseup', handleMouseUp);
+        container.removeEventListener('keydown', handleKeyDown);
       }
     };
   }, []);

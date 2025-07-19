@@ -1,4 +1,4 @@
-import { useState, useRef, DragEvent, KeyboardEvent } from "react";
+import { useState, useRef, DragEvent } from "react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
@@ -57,13 +57,15 @@ export default function EnhancedMarkdownEditor({
   };
 
   const handleAIEditorClick = () => {
-    const textarea = document.querySelector('textarea');
+    const textarea = textareaRef.current;
     if (textarea) {
-      textarea.select();
-      const event = new MouseEvent('mouseup', {
+      // Trigger cmd+j programmatically
+      const event = new KeyboardEvent('keydown', {
+        key: 'j',
+        metaKey: true,
+        ctrlKey: false,
         bubbles: true,
-        cancelable: true,
-        view: window
+        cancelable: true
       });
       textarea.dispatchEvent(event);
     }
@@ -174,7 +176,7 @@ export default function EnhancedMarkdownEditor({
     }
   };
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     // Check for Cmd+K (Mac) or Ctrl+K (Windows/Linux)
     if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
       e.preventDefault();
@@ -247,7 +249,7 @@ export default function EnhancedMarkdownEditor({
                 variant="outline"
                 size="sm"
                 className="flex items-center gap-2"
-                title="Open AI Editor (selects all text)"
+                title="Open AI Editor (Cmd+J)"
               >
                 <Sparkles className="h-4 w-4" />
                 AI Editor
@@ -303,7 +305,7 @@ export default function EnhancedMarkdownEditor({
             </SimplePromptEditor>
             
             <div className="absolute bottom-2 right-2 text-xs text-gray-400">
-              Cmd+K to create link • Drag or paste images
+              Cmd+J for AI editor • Cmd+K to create link • Drag or paste images
             </div>
           </div>
         </TabsContent>
