@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import MarkdownEditor from "../components/markdown-editor";
+import EnhancedMarkdownEditor from "../components/enhanced-markdown-editor";
 import { generateBlogPost } from "../lib/openai";
 import { fetchPRDataEnhanced } from "../lib/github-enhanced";
 import { supabase } from "../lib/supabase";
@@ -208,7 +208,7 @@ export default function Edit({ user }: { user: any }) {
         </Button>
       </div>
 
-      <MarkdownEditor
+      <EnhancedMarkdownEditor
         initialContent={blogContent}
         onRegenerate={handleRegenerate}
         isRegenerating={isLoading}
