@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { compressImage, uploadImage, isImageFile } from './image-upload';
 import { supabase } from './supabase';
+import type { User } from '@supabase/supabase-js';
 
 // Mock Supabase
 vi.mock('./supabase', () => ({
@@ -85,14 +86,14 @@ describe('image-upload', () => {
       vi.mocked(supabase.auth.getUser).mockResolvedValue({
         data: { user: null },
         error: null
-      });
+      } as any);
       
       await expect(uploadImage(file)).rejects.toThrow('You must be signed in to upload images');
     });
 
     it('should upload image successfully', async () => {
       const file = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
-      const mockUser = { id: 'user-123' };
+      const mockUser = { id: 'user-123' } as User;
       const mockPath = 'user-123/123456-abc.jpg';
       const mockPublicUrl = 'https://example.com/storage/editor-images/user-123/123456-abc.jpg';
       

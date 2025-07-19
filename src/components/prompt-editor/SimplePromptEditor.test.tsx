@@ -61,7 +61,7 @@ describe('SimplePromptEditor', () => {
         </SimplePromptEditor>
       );
 
-      const textarea = screen.getByRole('textbox');
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
       
       // No selection
       textarea.setSelectionRange(0, 0);
@@ -85,7 +85,7 @@ describe('SimplePromptEditor', () => {
         </SimplePromptEditor>
       );
 
-      const textarea = screen.getByRole('textbox');
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
       textarea.setSelectionRange(0, 4); // Select "Test"
       fireEvent.select(textarea);
       
@@ -107,7 +107,7 @@ describe('SimplePromptEditor', () => {
         </SimplePromptEditor>
       );
 
-      const textarea = screen.getByRole('textbox');
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
       textarea.setSelectionRange(0, 5);
       fireEvent.select(textarea);
       
@@ -130,7 +130,7 @@ describe('SimplePromptEditor', () => {
         </SimplePromptEditor>
       );
 
-      const textarea = screen.getByRole('textbox');
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
       textarea.setSelectionRange(0, 5);
       fireEvent.select(textarea);
       
@@ -160,7 +160,7 @@ describe('SimplePromptEditor', () => {
         </SimplePromptEditor>
       );
 
-      const textarea = screen.getByRole('textbox');
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
       textarea.setSelectionRange(6, 11); // Select "world"
       fireEvent.select(textarea);
       
@@ -190,7 +190,7 @@ describe('SimplePromptEditor', () => {
         </SimplePromptEditor>
       );
 
-      const textarea = screen.getByRole('textbox');
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
       textarea.setSelectionRange(0, 5);
       fireEvent.select(textarea);
       

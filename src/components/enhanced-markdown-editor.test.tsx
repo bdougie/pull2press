@@ -11,7 +11,6 @@ vi.mock('../../hooks/use-toast');
 
 describe('EnhancedMarkdownEditor', () => {
   const mockOnChange = vi.fn();
-  const mockOnRegenerate = vi.fn();
   const mockToast = vi.fn();
 
   beforeEach(() => {
@@ -29,7 +28,7 @@ describe('EnhancedMarkdownEditor', () => {
         />
       );
 
-      const textarea = screen.getByRole('textbox');
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
       
       // Select "world"
       textarea.setSelectionRange(6, 11);
@@ -49,7 +48,7 @@ describe('EnhancedMarkdownEditor', () => {
         />
       );
 
-      const textarea = screen.getByRole('textbox');
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
       
       // Select "hello"
       textarea.setSelectionRange(0, 5);
@@ -69,7 +68,7 @@ describe('EnhancedMarkdownEditor', () => {
         />
       );
 
-      const textarea = screen.getByRole('textbox');
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
       
       // Select "GitHub"
       textarea.setSelectionRange(10, 16);
@@ -89,7 +88,7 @@ describe('EnhancedMarkdownEditor', () => {
         />
       );
 
-      const textarea = screen.getByRole('textbox');
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
       
       // Position cursor at end
       textarea.setSelectionRange(6, 6);
@@ -109,7 +108,7 @@ describe('EnhancedMarkdownEditor', () => {
         />
       );
 
-      const textarea = screen.getByRole('textbox');
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
       
       // Select "console.log"
       textarea.setSelectionRange(8, 19);
