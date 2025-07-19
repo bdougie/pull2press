@@ -189,27 +189,34 @@ export default function EnhancedMarkdownEditor({
       const selectedText = content.substring(start, end);
       
       if (selectedText) {
-        // Prompt user for URL
-        const url = prompt('Enter URL for the link:');
-        if (url) {
-          const linkMarkdown = `[${selectedText}](${url})`;
-          const before = content.substring(0, start);
-          const after = content.substring(end);
-          const newContent = before + linkMarkdown + after;
-          setContent(newContent);
-          
-          // Set cursor position after the link
-          setTimeout(() => {
-            textarea.focus();
-            const newPosition = start + linkMarkdown.length;
-            textarea.setSelectionRange(newPosition, newPosition);
-          }, 0);
-        }
+        // Wrap selected text in markdown link syntax
+        const linkMarkdown = `[${selectedText}](url)`;
+        const before = content.substring(0, start);
+        const after = content.substring(end);
+        const newContent = before + linkMarkdown + after;
+        setContent(newContent);
+        
+        // Set cursor position inside the url placeholder
+        setTimeout(() => {
+          textarea.focus();
+          // Position cursor at the start of 'url' text
+          const urlStart = start + selectedText.length + 3; // +3 for ']('
+          const urlEnd = urlStart + 3; // length of 'url'
+          textarea.setSelectionRange(urlStart, urlEnd);
+        }, 0);
       } else {
-        toast({
-          title: "No text selected",
-          description: "Please select text to convert to a link",
-        });
+        // If no text is selected, insert empty link syntax and position cursor
+        const linkMarkdown = `[](url)`;
+        const before = content.substring(0, start);
+        const after = content.substring(start);
+        const newContent = before + linkMarkdown + after;
+        setContent(newContent);
+        
+        // Position cursor inside the square brackets
+        setTimeout(() => {
+          textarea.focus();
+          textarea.setSelectionRange(start + 1, start + 1);
+        }, 0);
       }
     }
   };
