@@ -5,7 +5,7 @@ import { fetchPRDataEnhanced } from "../lib/github-enhanced";
 import { supabase } from "../lib/supabase";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Button } from "../components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ExternalLink } from "lucide-react";
 import {
   buildEnhancedSystemPrompt,
   buildEnhancedUserPrompt,
@@ -227,6 +227,19 @@ export default function Edit({ user }: { user: any }) {
     navigate("/");
   };
 
+  // Parse PR URL to get owner/repo#number format
+  const getPRDisplay = (prUrl: string | null) => {
+    if (!prUrl) return null;
+    
+    // Extract owner, repo, and PR number from GitHub PR URL
+    const match = prUrl.match(/github\.com\/([^/]+)\/([^/]+)\/pull\/(\d+)/);
+    if (match) {
+      const [, owner, repo, number] = match;
+      return `${owner}/${repo}#${number}`;
+    }
+    return null;
+  };
+
   // Auto-save functionality
   const saveContent = useCallback(async (content: string) => {
     if (!user || !postId) return;
@@ -296,7 +309,7 @@ export default function Edit({ user }: { user: any }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center mb-4">
+      <div className="flex items-center justify-between mb-4">
         <Button
           variant="ghost"
           size="sm"
@@ -306,6 +319,18 @@ export default function Edit({ user }: { user: any }) {
           <ArrowLeft className="h-4 w-4" />
           Back to Home
         </Button>
+        
+        {currentPrUrl && (
+          <a
+            href={currentPrUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            {getPRDisplay(currentPrUrl) || "View PR"}
+            <ExternalLink className="h-4 w-4" />
+          </a>
+        )}
       </div>
 
       <EnhancedMarkdownEditor
