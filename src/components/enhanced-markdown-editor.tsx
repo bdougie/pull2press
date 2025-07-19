@@ -2,13 +2,20 @@ import { useState, useRef, DragEvent } from "react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import { Eye, Edit2, Copy, Check, ExternalLink, Sparkles, Upload } from "lucide-react";
+import { Eye, Edit2, Copy, Check, ExternalLink, Sparkles, Upload, HelpCircle } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { AuthButton } from "./auth-button";
 import RegenerationDropdown from "./regeneration-dropdown";
 import { SimplePromptEditor } from "./prompt-editor/SimplePromptEditor";
 import { uploadImage, isImageFile } from "../lib/image-upload";
 import { useToast } from "../../hooks/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "../../components/ui/dialog";
 
 interface EnhancedMarkdownEditorProps {
   initialContent: string;
@@ -33,6 +40,7 @@ export default function EnhancedMarkdownEditor({
   const [copied, setCopied] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [showTips, setShowTips] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { toast } = useToast();
 
@@ -76,6 +84,32 @@ export default function EnhancedMarkdownEditor({
       `Create an Astro blog using this markdown content as a blog post:\n\n${content}`
     );
     return `https://bolt.new?prompt=${prompt}`;
+  };
+
+  const wrapSelection = (before: string, after: string = before) => {
+    if (!textareaRef.current) return;
+    
+    const textarea = textareaRef.current;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = content.substring(start, end);
+    const beforeContent = content.substring(0, start);
+    const afterContent = content.substring(end);
+    
+    const newContent = beforeContent + before + selectedText + after + afterContent;
+    setContent(newContent);
+    
+    // Set cursor position
+    setTimeout(() => {
+      textarea.focus();
+      if (selectedText) {
+        // If text was selected, select the wrapped text
+        textarea.setSelectionRange(start + before.length, start + before.length + selectedText.length);
+      } else {
+        // If no text selected, position cursor between the markers
+        textarea.setSelectionRange(start + before.length, start + before.length);
+      }
+    }, 0);
   };
 
   const insertTextAtCursor = (text: string) => {
@@ -177,46 +211,68 @@ export default function EnhancedMarkdownEditor({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    // Check for Cmd+K (Mac) or Ctrl+K (Windows/Linux)
-    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-      e.preventDefault();
-      
-      const textarea = textareaRef.current;
-      if (!textarea) return;
-      
-      const start = textarea.selectionStart;
-      const end = textarea.selectionEnd;
-      const selectedText = content.substring(start, end);
-      
-      if (selectedText) {
-        // Wrap selected text in markdown link syntax
-        const linkMarkdown = `[${selectedText}](url)`;
-        const before = content.substring(0, start);
-        const after = content.substring(end);
-        const newContent = before + linkMarkdown + after;
-        setContent(newContent);
-        
-        // Set cursor position inside the url placeholder
-        setTimeout(() => {
-          textarea.focus();
-          // Position cursor at the start of 'url' text
-          const urlStart = start + selectedText.length + 3; // +3 for ']('
-          const urlEnd = urlStart + 3; // length of 'url'
-          textarea.setSelectionRange(urlStart, urlEnd);
-        }, 0);
-      } else {
-        // If no text is selected, insert empty link syntax and position cursor
-        const linkMarkdown = `[](url)`;
-        const before = content.substring(0, start);
-        const after = content.substring(start);
-        const newContent = before + linkMarkdown + after;
-        setContent(newContent);
-        
-        // Position cursor inside the square brackets
-        setTimeout(() => {
-          textarea.focus();
-          textarea.setSelectionRange(start + 1, start + 1);
-        }, 0);
+    const isMeta = e.metaKey || e.ctrlKey;
+    
+    if (isMeta) {
+      switch (e.key) {
+        case 'b':
+          e.preventDefault();
+          wrapSelection('**');
+          break;
+        case 'i':
+          e.preventDefault();
+          wrapSelection('*');
+          break;
+        case 'k':
+          e.preventDefault();
+          const textarea = textareaRef.current;
+          if (!textarea) return;
+          
+          const start = textarea.selectionStart;
+          const end = textarea.selectionEnd;
+          const selectedText = content.substring(start, end);
+          
+          if (selectedText) {
+            // Wrap selected text in markdown link syntax
+            const linkMarkdown = `[${selectedText}](url)`;
+            const before = content.substring(0, start);
+            const after = content.substring(end);
+            const newContent = before + linkMarkdown + after;
+            setContent(newContent);
+            
+            // Set cursor position inside the url placeholder
+            setTimeout(() => {
+              textarea.focus();
+              // Position cursor at the start of 'url' text
+              const urlStart = start + selectedText.length + 3; // +3 for ']('
+              const urlEnd = urlStart + 3; // length of 'url'
+              textarea.setSelectionRange(urlStart, urlEnd);
+            }, 0);
+          } else {
+            // If no text is selected, insert empty link syntax and position cursor
+            const linkMarkdown = `[](url)`;
+            const before = content.substring(0, start);
+            const after = content.substring(start);
+            const newContent = before + linkMarkdown + after;
+            setContent(newContent);
+            
+            // Position cursor inside the square brackets
+            setTimeout(() => {
+              textarea.focus();
+              textarea.setSelectionRange(start + 1, start + 1);
+            }, 0);
+          }
+          break;
+      }
+    }
+    
+    // Alt/Option key shortcuts
+    if (e.altKey) {
+      switch (e.key) {
+        case '`':
+          e.preventDefault();
+          wrapSelection('`');
+          break;
       }
     }
   };
@@ -311,9 +367,6 @@ export default function EnhancedMarkdownEditor({
               />
             </SimplePromptEditor>
             
-            <div className="absolute bottom-2 right-2 text-xs text-gray-400">
-              Cmd+J for AI editor • Cmd+K to create link • Drag or paste images
-            </div>
           </div>
         </TabsContent>
 
@@ -332,33 +385,80 @@ export default function EnhancedMarkdownEditor({
               <AuthButton />
             </div>
           )}
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={handleCopy}
-              className="flex items-center gap-2"
-            >
-              {copied ? (
-                <>
-                  <Check className="h-4 w-4" />
-                  Copied!
-                </>
-              ) : (
-                <>
-                  <Copy className="h-4 w-4" />
-                  Copy
-                </>
-              )}
-            </Button>
-            <a href={getBoltNewUrl()} target="_blank" rel="noopener noreferrer">
-              <Button className="flex items-center gap-2">
-                <ExternalLink className="h-4 w-4" />
-                Create Astro Blog
+          <div className="flex items-center justify-between flex-1">
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={handleCopy}
+                className="flex items-center gap-2"
+              >
+                {copied ? (
+                  <>
+                    <Check className="h-4 w-4" />
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-4 w-4" />
+                    Copy
+                  </>
+                )}
               </Button>
-            </a>
+              <a href={getBoltNewUrl()} target="_blank" rel="noopener noreferrer">
+                <Button className="flex items-center gap-2">
+                  <ExternalLink className="h-4 w-4" />
+                  Create Astro Blog
+                </Button>
+              </a>
+            </div>
+            <button
+              onClick={() => setShowTips(true)}
+              className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1 transition-colors"
+            >
+              <HelpCircle className="h-4 w-4" />
+              Keyboard shortcuts
+            </button>
           </div>
         </div>
       </Tabs>
+      
+      <Dialog open={showTips} onOpenChange={setShowTips}>
+        <DialogContent className="sm:max-w-[500px] fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%]">
+          <DialogHeader>
+            <DialogTitle>Keyboard Shortcuts</DialogTitle>
+            <DialogDescription>
+              Quick markdown editing shortcuts for the editor
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-[120px_1fr] gap-4 text-sm">
+              <div className="font-mono bg-gray-100 px-3 py-1.5 rounded text-center">Cmd+B</div>
+              <div className="py-1.5">Bold text</div>
+              
+              <div className="font-mono bg-gray-100 px-3 py-1.5 rounded text-center">Cmd+I</div>
+              <div className="py-1.5">Italic text</div>
+              
+              <div className="font-mono bg-gray-100 px-3 py-1.5 rounded text-center">Cmd+K</div>
+              <div className="py-1.5">Insert link</div>
+              
+              <div className="font-mono bg-gray-100 px-3 py-1.5 rounded text-center">Alt+`</div>
+              <div className="py-1.5">Inline code</div>
+              
+              <div className="font-mono bg-gray-100 px-3 py-1.5 rounded text-center">Cmd+J</div>
+              <div className="py-1.5">Open AI editor</div>
+            </div>
+            
+            <div className="mt-2 pt-4 border-t">
+              <p className="text-sm font-medium mb-2">Other features:</p>
+              <ul className="text-sm text-gray-600 space-y-1">
+                <li>• Drag and drop images to upload</li>
+                <li>• Paste images from clipboard</li>
+                <li>• Maximum image size: 4MB</li>
+              </ul>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }
