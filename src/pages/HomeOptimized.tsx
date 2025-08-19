@@ -38,10 +38,9 @@ export default function HomeOptimized({ user }: { user: any }) {
           .from("cached_posts")
           .select("*")
           .eq("pr_url", prUrl)
-          .eq("user_id", user.id)
-          .single();
+          .eq("user_id", user.id);
 
-        if (existingPosts) {
+        if (existingPosts && existingPosts.length > 0) {
           setProgress({
             stage: 'complete',
             progress: 100,
@@ -51,7 +50,7 @@ export default function HomeOptimized({ user }: { user: any }) {
           // Small delay for user to see the complete state
           await new Promise(resolve => setTimeout(resolve, 500));
           
-          navigate(`/edit/${existingPosts.id}`);
+          navigate(`/edit/${existingPosts[0].id}`);
           return;
         }
       }
