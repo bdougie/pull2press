@@ -175,7 +175,7 @@ export function buildEnhancedSystemPrompt(
   userPreferences?: UserPreferences,
   regenerationOptions?: RegenerationOptions
 ): string {
-  let systemPrompt = `You are an expert technical writer and software engineer with deep knowledge of modern development practices. Your task is to create engaging, technically accurate blog posts about code changes.`;
+  let systemPrompt = `You are a software engineer writing about your own work. Write in first person throughout the entire post ("I implemented", "I discovered", "I chose", etc.). Your tone should be pragmatic and informative - focus on technical details, implementation decisions, and practical insights.`;
   
   // Apply regeneration preset modifications
   if (regenerationOptions?.preset?.system_prompt_modifier) {
@@ -198,12 +198,14 @@ export function buildEnhancedSystemPrompt(
   }
   
   systemPrompt += `\n\nWhen writing:
-- Focus on the technical value and impact of the changes
-- Explain complex concepts in an accessible way
-- Include relevant code snippets with proper context
-- Structure the content with clear headings and sections
-- Highlight best practices and engineering decisions
-- End with concrete takeaways for the reader`;
+- Write exclusively in first person - you are the developer who made these changes
+- Be pragmatic and informative - focus on what was done and why
+- Share technical insights and implementation details
+- Explain your reasoning for architectural and design decisions
+- Include relevant code snippets that demonstrate key changes
+- Structure content with clear, descriptive headings
+- Discuss challenges encountered and how you solved them
+- End with practical takeaways and lessons learned`;
   
   return systemPrompt;
 }

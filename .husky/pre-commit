@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# Run build before commit to catch TypeScript errors
+echo "Running build check..."
+npm run build
+
+# If build fails, prevent commit
+if [ $? -ne 0 ]; then
+  echo "❌ Build failed! Please fix errors before committing."
+  exit 1
+fi
+
+echo "✅ Build successful!"
+
+# Also run tests if they exist
+npm test 2>/dev/null || true

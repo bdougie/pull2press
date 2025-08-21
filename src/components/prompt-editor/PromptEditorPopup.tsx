@@ -3,6 +3,7 @@ import { X, Sparkles, Copy, Check, Send, AlertCircle } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card } from '../ui/card';
 import { streamPromptResponse, ConversationContext } from '../../lib/prompt-editor';
+import { findHelpfulLinks, formatLinksAsMarkdown } from '../../lib/link-finder';
 
 interface PromptEditorPopupProps {
   selectedText: string;
@@ -16,13 +17,21 @@ interface Message {
   content: string;
 }
 
-const EXAMPLE_PROMPTS = [
+interface ExamplePrompt {
+  icon: string;
+  label: string;
+  prompt: string;
+  isSpecial?: boolean;
+}
+
+const EXAMPLE_PROMPTS: ExamplePrompt[] = [
   { icon: '📝', label: 'Improve writing', prompt: 'Improve the clarity and style of this text' },
   { icon: '✅', label: 'Fix grammar', prompt: 'Fix spelling and grammar errors' },
   { icon: '📢', label: 'Add CTA', prompt: 'Add a compelling call-to-action' },
   { icon: '💻', label: 'Add code example', prompt: 'Add a relevant code example' },
   { icon: '🎯', label: 'Make concise', prompt: 'Make this more concise while keeping the key points' },
   { icon: '🔗', label: 'Add GitHub links', prompt: 'Add GitHub links to relevant files mentioned in this text. Use semantic search to find the actual file paths on the default branch and create direct links. If specific files cannot be found, include a link to the PR as fallback. Integrate the links naturally into the text or as a call-to-action.' },
+  { icon: '🔍', label: 'Find helpful links', prompt: '__FIND_HELPFUL_LINKS__', isSpecial: true },
 ];
 
 export function PromptEditorPopup({ 
@@ -38,6 +47,7 @@ export function PromptEditorPopup({
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [tokenCount, setTokenCount] = useState(0);
+  const [isFindingLinks, setIsFindingLinks] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const contextRef = useRef(new ConversationContext(5));
@@ -53,7 +63,50 @@ export function PromptEditorPopup({
   }, [messages, streamingContent]);
 
   const handlePromptClick = async (prompt: string) => {
-    await handleSendMessage(prompt);
+    if (prompt === '__FIND_HELPFUL_LINKS__') {
+      await handleFindHelpfulLinks();
+    } else {
+      await handleSendMessage(prompt);
+    }
+  };
+
+  const handleFindHelpfulLinks = async () => {
+    setIsFindingLinks(true);
+    setError(null);
+
+    try {
+      const response = await findHelpfulLinks(selectedText, { maxLinks: 5 });
+      
+      if (response.links && response.links.length > 0) {
+        
+        // Format the links as markdown
+        const linksMarkdown = formatLinksAsMarkdown(response.links);
+        
+        // Create a message with the found links
+        const assistantMessage: Message = {
+          role: 'assistant',
+          content: `I found ${response.links.length} helpful resources for your content:\n${linksMarkdown}\n\nYou can apply these links to add them to your content, or I can help you integrate them more naturally into the text.`
+        };
+        
+        setMessages(prev => [...prev, assistantMessage]);
+        
+        // Add to context
+        contextRef.current.addMessage({ 
+          role: 'assistant', 
+          content: assistantMessage.content 
+        });
+        
+        // Update token count
+        setTokenCount(contextRef.current.getTotalTokens());
+      } else {
+        setError('No helpful links found for this content');
+      }
+    } catch (error) {
+      console.error('Error finding helpful links:', error);
+      setError(error instanceof Error ? error.message : 'Failed to find helpful links');
+    } finally {
+      setIsFindingLinks(false);
+    }
   };
 
   const handleSendMessage = async (message: string) => {
@@ -180,10 +233,14 @@ export function PromptEditorPopup({
                 <button
                   key={index}
                   onClick={() => handlePromptClick(prompt.prompt)}
-                  className="w-full text-left p-2 rounded-md border border-[#d0d7de] hover:bg-[#f6f8fa] transition-colors"
+                  disabled={isFindingLinks}
+                  className="w-full text-left p-2 rounded-md border border-[#d0d7de] hover:bg-[#f6f8fa] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <span className="mr-2">{prompt.icon}</span>
                   <span className="text-sm text-[#24292f]">{prompt.label}</span>
+                  {prompt.label === 'Find helpful links' && isFindingLinks && (
+                    <span className="ml-2 text-xs text-[#57606a]">(searching...)</span>
+                  )}
                 </button>
               ))}
             </div>
