@@ -166,8 +166,8 @@ describe('generateStylePrompt', () => {
 describe('buildEnhancedSystemPrompt', () => {
   it('should build basic system prompt without user preferences', () => {
     const prompt = buildEnhancedSystemPrompt();
-    expect(prompt).toContain('expert technical writer');
-    expect(prompt).toContain('blog posts about code changes');
+    expect(prompt).toContain('software engineer writing about your own work');
+    expect(prompt).toContain('first person');
     expect(prompt).not.toContain('user\'s preferences');
   });
 
