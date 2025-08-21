@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { X, Sparkles, Copy, Check, Send, AlertCircle, Link2 } from 'lucide-react';
+import { X, Sparkles, Copy, Check, Send, AlertCircle } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card } from '../ui/card';
 import { streamPromptResponse, ConversationContext } from '../../lib/prompt-editor';
-import { findHelpfulLinks, formatLinksAsMarkdown, LinkSuggestion } from '../../lib/link-finder';
+import { findHelpfulLinks, formatLinksAsMarkdown } from '../../lib/link-finder';
 
 interface PromptEditorPopupProps {
   selectedText: string;
@@ -48,7 +48,6 @@ export function PromptEditorPopup({
   const [error, setError] = useState<string | null>(null);
   const [tokenCount, setTokenCount] = useState(0);
   const [isFindingLinks, setIsFindingLinks] = useState(false);
-  const [foundLinks, setFoundLinks] = useState<LinkSuggestion[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const contextRef = useRef(new ConversationContext(5));
@@ -63,7 +62,7 @@ export function PromptEditorPopup({
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, streamingContent]);
 
-  const handlePromptClick = async (prompt: string, isSpecial?: boolean) => {
+  const handlePromptClick = async (prompt: string) => {
     if (prompt === '__FIND_HELPFUL_LINKS__') {
       await handleFindHelpfulLinks();
     } else {
@@ -79,7 +78,6 @@ export function PromptEditorPopup({
       const response = await findHelpfulLinks(selectedText, { maxLinks: 5 });
       
       if (response.links && response.links.length > 0) {
-        setFoundLinks(response.links);
         
         // Format the links as markdown
         const linksMarkdown = formatLinksAsMarkdown(response.links);
@@ -234,7 +232,7 @@ export function PromptEditorPopup({
               {EXAMPLE_PROMPTS.map((prompt, index) => (
                 <button
                   key={index}
-                  onClick={() => handlePromptClick(prompt.prompt, prompt.isSpecial)}
+                  onClick={() => handlePromptClick(prompt.prompt)}
                   disabled={isFindingLinks}
                   className="w-full text-left p-2 rounded-md border border-[#d0d7de] hover:bg-[#f6f8fa] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
