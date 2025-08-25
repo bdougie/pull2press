@@ -27,7 +27,7 @@ jobs:
           fetch-depth: 0  # Full history for better context
       
       - name: Run Continue Review
-        uses: bdougie/contributor.info/actions/continue-review@47a43990ba5f89c6d389e846ea39618690ba5f89 # SHA pinned
+        uses: bdougie/contributor.info/actions/continue-review@74808a751cbaef2dc448fc13ef254513a24abea5 # SHA pinned for security
         with:
           continue-api-key: ${{ secrets.CONTINUE_API_KEY }}
           continue-org: 'continuedev'  # Replace with your Continue org
