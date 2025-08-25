@@ -27,9 +27,9 @@ jobs:
           fetch-depth: 0  # Full history for better context
       
       - name: Run Continue Review
-        uses: bdougie/contributor.info/actions/continue-review@74808a751cbaef2dc448fc13ef254513a24abea5 # SHA pinned for security
+        uses: bdougie/contributor.info/actions/continue-review@feat/continue-review-app-auth
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           continue-api-key: ${{ secrets.CONTINUE_API_KEY }}
-          continue-org: 'continuedev'  # Replace with your Continue org
-          continue-config: 'continuedev/review-bot'  # Replace with your assistant path
+          continue-org: 'bdougie'
+          continue-config: 'bdougie/code-reviewer'
