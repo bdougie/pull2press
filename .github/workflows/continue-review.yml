@@ -30,5 +30,5 @@ jobs:
         uses: bdougie/contributor.info/actions/continue-review@47a43990ba5f89c6d389e846ea39618690ba5f89 # SHA pinned
         with:
           continue-api-key: ${{ secrets.CONTINUE_API_KEY }}
-          continue-org: 'your-continue-org'  # Replace with your Continue org
-          continue-config: 'your-org/your-assistant'  # Replace with your assistant path
+          continue-org: 'continuedev'  # Replace with your Continue org
+          continue-config: 'continuedev/review-bot'  # Replace with your assistant path
