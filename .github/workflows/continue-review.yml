@@ -1,0 +1,34 @@
+name: Continue Agent Code Review
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review]
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    # Run on PRs automatically, or when triggered by @continue-agent in comments
+    if: |
+      github.event_name == 'pull_request' || 
+      (github.event_name == 'issue_comment' && 
+       github.event.issue.pull_request && 
+       contains(github.event.comment.body, '@continue-agent'))
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1 - SHA pinned for security
+        with:
+          fetch-depth: 0  # Full history for better context
+      
+      - name: Run Continue Review
+        uses: bdougie/contributor.info/actions/continue-review@47a43990ba5f89c6d389e846ea39618690ba5f89 # SHA pinned
+        with:
+          continue-api-key: ${{ secrets.CONTINUE_API_KEY }}
+          continue-org: 'your-continue-org'  # Replace with your Continue org
+          continue-config: 'your-org/your-assistant'  # Replace with your assistant path
