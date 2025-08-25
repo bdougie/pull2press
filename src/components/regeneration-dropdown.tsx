@@ -114,12 +114,15 @@ export default function RegenerationDropdown({
         size="sm"
         onClick={handleSimpleRegenerate}
         disabled={isRegenerating}
-        className="flex items-center gap-2"
+        className="flex items-center gap-2 px-2 md:px-3"
+        title={isRegenerating ? "Regenerating..." : "Regenerate content"}
       >
         <RefreshCw
           className={`h-4 w-4 ${isRegenerating ? "animate-spin" : ""}`}
         />
-        {isRegenerating ? "Regenerating..." : "Regenerate"}
+        <span className="hidden sm:inline">
+          {isRegenerating ? "Regenerating..." : "Regenerate"}
+        </span>
       </Button>
     );
   }
@@ -132,13 +135,16 @@ export default function RegenerationDropdown({
             variant="outline"
             size="sm"
             disabled={isRegenerating}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 px-2 md:px-3"
+            title={isRegenerating ? "Regenerating..." : "Regenerate options"}
           >
             <RefreshCw
               className={`h-4 w-4 ${isRegenerating ? "animate-spin" : ""}`}
             />
-            {isRegenerating ? "Regenerating..." : "Regenerate"}
-            <ChevronDown className="h-3 w-3" />
+            <span className="hidden sm:inline">
+              {isRegenerating ? "Regenerating..." : "Regenerate"}
+            </span>
+            <ChevronDown className="h-3 w-3 hidden sm:inline" />
           </Button>
         </DropdownMenuTrigger>
         

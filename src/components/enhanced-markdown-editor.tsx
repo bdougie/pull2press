@@ -344,11 +344,11 @@ export default function EnhancedMarkdownEditor({
                 onClick={handleAIEditorClick}
                 variant="outline"
                 size="sm"
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 md:gap-2 px-2 md:px-3"
                 title="Open AI Editor (Cmd+J)"
               >
                 <Sparkles className="h-4 w-4" />
-                AI Editor
+                <span className="hidden sm:inline">AI Editor</span>
               </Button>
               
               {onRegenerate && (
@@ -423,17 +423,18 @@ export default function EnhancedMarkdownEditor({
               <Button
                 variant="outline"
                 onClick={handleCopy}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 px-2 md:px-3"
+                title="Copy all content to clipboard"
               >
                 {copied ? (
                   <>
                     <Check className="h-4 w-4" />
-                    Copied!
+                    <span className="hidden sm:inline">Copied!</span>
                   </>
                 ) : (
                   <>
                     <Copy className="h-4 w-4" />
-                    Copy
+                    <span className="hidden sm:inline">Copy All</span>
                   </>
                 )}
               </Button>
