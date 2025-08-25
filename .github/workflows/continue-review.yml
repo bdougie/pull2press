@@ -31,5 +31,5 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           continue-api-key: ${{ secrets.CONTINUE_API_KEY }}
-          continue-org: 'bdougie'
-          continue-config: 'bdougie/code-reviewer'
+          continue-org: 'continuedev'
+          continue-config: 'continuedev/review-bot'
