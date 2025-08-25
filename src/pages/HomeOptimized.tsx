@@ -6,8 +6,9 @@ import { fetchPRDataOptimized, FetchProgress } from "../lib/github-optimized";
 import { generateBlogPost } from "../lib/openai";
 import { supabase } from "../lib/supabase";
 import { LoadingProgress } from "../components/loading-progress";
+import type { User } from "../types/user";
 
-export default function HomeOptimized({ user }: { user: any }) {
+export default function HomeOptimized({ user }: { user: User | null }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState<FetchProgress>({

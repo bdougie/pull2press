@@ -6,8 +6,9 @@ import { fetchPRDataEnhanced } from "../lib/github-enhanced";
 import { generateBlogPost } from "../lib/openai";
 import { supabase } from "../lib/supabase";
 import { EnhancedLoadingProgress, EnhancedFetchProgress } from "../components/enhanced-loading-progress";
+import type { User } from "../types/user";
 
-export default function HomeEnhanced({ user }: { user: any }) {
+export default function HomeEnhanced({ user }: { user: User | null }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState<EnhancedFetchProgress>({
