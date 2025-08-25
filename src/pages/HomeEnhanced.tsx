@@ -6,8 +6,9 @@ import { fetchPRDataEnhanced } from "../lib/github-enhanced";
 import { generateBlogPost } from "../lib/openai";
 import { supabase } from "../lib/supabase";
 import { EnhancedLoadingProgress, EnhancedFetchProgress } from "../components/enhanced-loading-progress";
+import type { User } from "../types/user";
 
-export default function HomeEnhanced({ user }: { user: any }) {
+export default function HomeEnhanced({ user }: { user: User | null }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState<EnhancedFetchProgress>({
@@ -38,10 +39,9 @@ export default function HomeEnhanced({ user }: { user: any }) {
           .from("cached_posts")
           .select("*")
           .eq("pr_url", prUrl)
-          .eq("user_id", user.id)
-          .single();
+          .eq("user_id", user.id);
 
-        if (existingPosts) {
+        if (existingPosts && existingPosts.length > 0) {
           setProgress({
             stage: 'complete',
             progress: 100,
@@ -51,7 +51,7 @@ export default function HomeEnhanced({ user }: { user: any }) {
           // Small delay for user to see the complete state
           await new Promise(resolve => setTimeout(resolve, 500));
           
-          navigate(`/edit/${existingPosts.id}`);
+          navigate(`/edit/${existingPosts[0].id}`);
           return;
         }
       }

@@ -10,6 +10,13 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  define: {
+    // Suppress Node.js module warnings in browser
+    'process.env': {},
+  },
+  optimizeDeps: {
+    exclude: ['os', 'fs', 'path'],
+  },
   server: {
     // No proxy needed - Supabase functions are called directly
   },
