@@ -27,7 +27,7 @@ jobs:
           fetch-depth: 0  # Full history for better context
       
       - name: Run Continue Review
-        uses: bdougie/contributor.info/actions/continue-review@feat/continue-review-app-auth
+        uses: bdougie/contributor.info/actions/continue-review@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           continue-api-key: ${{ secrets.CONTINUE_API_KEY }}
