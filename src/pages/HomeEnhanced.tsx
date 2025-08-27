@@ -65,11 +65,60 @@ export default function HomeEnhanced({ user }: { user: User | null }) {
         message: 'Creating your blog post with AI...'
       });
 
-      const content = await generateBlogPost(prData);
+      // Provide progressive updates during AI generation to improve UX
+      const generateWithProgress = async () => {
+        const statusMessages = [
+          { progress: 87, message: 'Analyzing code changes...' },
+          { progress: 89, message: 'Understanding the context...' },
+          { progress: 91, message: 'Generating content structure...' },
+          { progress: 93, message: 'Writing the blog post...' }
+        ];
+
+        let messageIndex = 0;
+        
+        // Start progress updates
+        const progressInterval = setInterval(() => {
+          if (messageIndex < statusMessages.length) {
+            const currentStatus = statusMessages[messageIndex];
+            setProgress({
+              stage: 'generating',
+              progress: currentStatus.progress,
+              message: currentStatus.message
+            });
+            messageIndex++;
+          }
+        }, 800); // Update every 800ms for smooth progression
+
+        try {
+          const content = await generateBlogPost(prData);
+          clearInterval(progressInterval);
+          return content;
+        } catch (error) {
+          clearInterval(progressInterval);
+          // Provide specific error feedback during generation
+          setProgress({
+            stage: 'generating',
+            progress: 93,
+            message: 'Generation failed. Please try again.'
+          });
+          throw error;
+        }
+      };
+
+      const content = await generateWithProgress();
 
       setProgress({
         stage: 'complete',
         progress: 95,
+        message: 'Finalizing blog post...'
+      });
+
+      // Brief pause to show the finalizing message
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      setProgress({
+        stage: 'complete',
+        progress: 98,
         message: 'Saving your content...'
       });
 
