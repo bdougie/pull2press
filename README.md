@@ -1,8 +1,10 @@
 # Pull2Press
 
+> **This project is no longer maintained.** The hosted service at pull2press.com has been shut down and support has ended. The code remains available under the Apache 2.0 license: fork this repository and run it yourself with your own GitHub, OpenAI, and Supabase credentials using the setup steps below. The deployed site currently renders a shutdown notice; to restore the full app in your fork, follow the comment in `src/main.tsx`.
+
 Pull2Press is a tool that converts GitHub pull requests into publishable content. It leverages the GitHub API to fetch pull request data and uses OpenAI's API to transform technical changes into readable, structured content.
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/yourusername/pull2press)
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/bdougie/pull2press)
 
 ## Features
 
@@ -22,17 +24,20 @@ Pull2Press is a tool that converts GitHub pull requests into publishable content
 ## Local Setup
 
 1. Clone the repository:
+
    ```bash
-   git clone https://github.com/yourusername/pull2press.git
+   git clone https://github.com/bdougie/pull2press.git
    cd pull2press
    ```
 
 2. Install dependencies:
+
    ```bash
    npm install
    ```
 
 3. Create a `.env` file in the root directory with the following variables:
+
    ```
    VITE_SUPABASE_URL=your_supabase_project_url
    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
@@ -44,10 +49,11 @@ Pull2Press is a tool that converts GitHub pull requests into publishable content
    - Go to your Supabase project dashboard
    - Navigate to Edge Functions settings
    - Add the `OPENAI_API_KEY` environment variable with your OpenAI API key
-   
+
    Note: The `prompt-editor` edge function requires the OPENAI_API_KEY to be set in Supabase's environment variables, not just in your local .env file.
 
 5. Start the development server:
+
    ```bash
    npm run dev
    ```
@@ -59,16 +65,19 @@ Pull2Press is a tool that converts GitHub pull requests into publishable content
 Pull2Press uses Vitest for testing. You can run tests using the following npm scripts:
 
 1. Run all tests once:
+
    ```bash
    npm test
    ```
 
 2. Run tests in watch mode (for development):
+
    ```bash
    npm run test:watch
    ```
 
 3. Run tests with UI:
+
    ```bash
    npm run test:ui
    ```
@@ -141,7 +150,7 @@ const response = await openai.chat.completions.create({
   model: "gpt-4",
   messages: [
     { role: "system", content: systemPrompt },
-    { role: "user", content: userPrompt }
+    { role: "user", content: userPrompt },
   ],
   temperature: 0.7,
 });
@@ -168,15 +177,15 @@ Example of Ollama API interaction:
 
 ```javascript
 const response = await fetch(`${OLLAMA_API_URL}/api/chat`, {
-  method: 'POST',
+  method: "POST",
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
   body: JSON.stringify({
     model: DEFAULT_MODEL,
     messages: [
       { role: "system", content: systemPrompt },
-      { role: "user", content: userPrompt }
+      { role: "user", content: userPrompt },
     ],
     options: {
       temperature: 0.7,
