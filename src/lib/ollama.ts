@@ -17,8 +17,8 @@ export async function generateBlogPost(prData: PullRequestData) {
       body: JSON.stringify({
         model: DEFAULT_MODEL,
         messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
         ],
         options: {
           temperature: 0.7,
@@ -46,7 +46,7 @@ export async function isOllamaAvailable(): Promise<boolean> {
       method: 'GET',
     });
     return response.ok;
-  } catch (error) {
+  } catch {
     return false;
   }
 }

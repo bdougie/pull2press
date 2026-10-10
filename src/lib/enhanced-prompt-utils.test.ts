@@ -20,16 +20,16 @@ describe('analyzeWritingStyle', () => {
       avgSentenceLength: 20,
       vocabularyLevel: 'intermediate',
       structurePreference: 'structured',
-      codeExampleStyle: 'detailed'
+      codeExampleStyle: 'detailed',
     });
   });
 
   it('should detect casual tone from writing samples', () => {
     const samples = [
       "Hey folks! Gonna show you this awesome feature I built. It's pretty cool stuff.",
-      "So I was thinking, hey, why not make this thing work better? Kinda makes sense, right?",
-      "Wanna see something cool? Check out this implementation!",
-      "This is gonna be awesome when we ship it!"
+      'So I was thinking, hey, why not make this thing work better? Kinda makes sense, right?',
+      'Wanna see something cool? Check out this implementation!',
+      'This is gonna be awesome when we ship it!',
     ];
     const result = analyzeWritingStyle(samples);
     expect(result.tone).toBe('casual');
@@ -37,10 +37,10 @@ describe('analyzeWritingStyle', () => {
 
   it('should detect technical tone from writing samples', () => {
     const samples = [
-      "The implementation leverages a middleware architecture for optimal abstraction.",
-      "This refactoring optimizes the algorithm through improved data structures.",
-      "The architecture employs a microservices pattern with event-driven communication.",
-      "Performance optimization was achieved through algorithmic improvements."
+      'The implementation leverages a middleware architecture for optimal abstraction.',
+      'This refactoring optimizes the algorithm through improved data structures.',
+      'The architecture employs a microservices pattern with event-driven communication.',
+      'Performance optimization was achieved through algorithmic improvements.',
     ];
     const result = analyzeWritingStyle(samples);
     expect(result.tone).toBe('technical');
@@ -48,22 +48,22 @@ describe('analyzeWritingStyle', () => {
 
   it('should calculate average sentence length correctly', () => {
     const samples = [
-      "This is short. Very short. Tiny sentences.",
-      "Quick and punchy. Direct communication. No fluff."
+      'This is short. Very short. Tiny sentences.',
+      'Quick and punchy. Direct communication. No fluff.',
     ];
     const result = analyzeWritingStyle(samples);
     expect(result.avgSentenceLength).toBeLessThan(10);
   });
 
   it('should detect vocabulary level', () => {
-    const simpleText = ["This is easy to read. Simple words here. Nothing complex."];
+    const simpleText = ['This is easy to read. Simple words here. Nothing complex.'];
     const advancedText = [
-      "The heterogeneous implementation demonstrates polymorphic characteristics through abstraction layers."
+      'The heterogeneous implementation demonstrates polymorphic characteristics through abstraction layers.',
     ];
-    
+
     const simpleResult = analyzeWritingStyle(simpleText);
     const advancedResult = analyzeWritingStyle(advancedText);
-    
+
     expect(simpleResult.vocabularyLevel).toBe('simple');
     expect(advancedResult.vocabularyLevel).toBe('advanced');
   });
@@ -71,7 +71,7 @@ describe('analyzeWritingStyle', () => {
   it('should detect tutorial structure preference', () => {
     const samples = [
       "First, let's set up our environment. Next, we'll configure the database. Then, implement the feature. Finally, test everything.",
-      "Step 1: Install dependencies. Step 2: Configure settings. Step 3: Run the application."
+      'Step 1: Install dependencies. Step 2: Configure settings. Step 3: Run the application.',
     ];
     const result = analyzeWritingStyle(samples);
     expect(result.structurePreference).toBe('tutorial');
@@ -87,14 +87,14 @@ describe('analyzeWritingStyle', () => {
       - Point two
       - Point three
       
-      ## Conclusion`
+      ## Conclusion`,
     ];
     const result = analyzeWritingStyle(samples);
     expect(result.structurePreference).toBe('structured');
   });
 
   it('should detect code example style', () => {
-    const minimalCode = ["Use `Array.map()` for transformation and `filter()` for filtering."];
+    const minimalCode = ['Use `Array.map()` for transformation and `filter()` for filtering.'];
     const annotatedCode = [
       `\`\`\`javascript
       // This function handles user authentication
@@ -104,12 +104,12 @@ describe('analyzeWritingStyle', () => {
         // Then check the password
         return validatePassword(user.password);
       }
-      \`\`\``
+      \`\`\``,
     ];
-    
+
     const minimalResult = analyzeWritingStyle(minimalCode);
     const annotatedResult = analyzeWritingStyle(annotatedCode);
-    
+
     expect(minimalResult.codeExampleStyle).toBe('minimal');
     expect(annotatedResult.codeExampleStyle).toBe('annotated');
   });
@@ -122,7 +122,7 @@ describe('generateStylePrompt', () => {
       avgSentenceLength: 15,
       vocabularyLevel: 'simple',
       structurePreference: 'narrative',
-      codeExampleStyle: 'minimal'
+      codeExampleStyle: 'minimal',
     };
     const prompt = generateStylePrompt(style);
     expect(prompt).toContain('casual, conversational tone');
@@ -135,7 +135,7 @@ describe('generateStylePrompt', () => {
       avgSentenceLength: 25,
       vocabularyLevel: 'advanced',
       structurePreference: 'structured',
-      codeExampleStyle: 'annotated'
+      codeExampleStyle: 'annotated',
     };
     const prompt = generateStylePrompt(style);
     expect(prompt).toContain('precise technical language');
@@ -148,16 +148,16 @@ describe('generateStylePrompt', () => {
       avgSentenceLength: 10,
       vocabularyLevel: 'intermediate',
       structurePreference: 'narrative',
-      codeExampleStyle: 'detailed'
+      codeExampleStyle: 'detailed',
     };
     const longStyle: WritingStyle = {
       ...shortStyle,
-      avgSentenceLength: 30
+      avgSentenceLength: 30,
     };
-    
+
     const shortPrompt = generateStylePrompt(shortStyle);
     const longPrompt = generateStylePrompt(longStyle);
-    
+
     expect(shortPrompt).toContain('concise and punchy');
     expect(longPrompt).toContain('detailed, comprehensive sentences');
   });
@@ -168,7 +168,7 @@ describe('buildEnhancedSystemPrompt', () => {
     const prompt = buildEnhancedSystemPrompt();
     expect(prompt).toContain('software engineer writing about your own work');
     expect(prompt).toContain('first person');
-    expect(prompt).not.toContain('user\'s preferences');
+    expect(prompt).not.toContain("user's preferences");
   });
 
   it('should incorporate user preferences into system prompt', () => {
@@ -180,11 +180,11 @@ describe('buildEnhancedSystemPrompt', () => {
       preferred_length: 'short',
       custom_instructions: 'Always include emojis',
       created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     };
-    
+
     const prompt = buildEnhancedSystemPrompt(userPreferences);
-    expect(prompt).toContain('user\'s preferences');
+    expect(prompt).toContain("user's preferences");
     expect(prompt).toContain('Always include emojis');
   });
 
@@ -197,14 +197,14 @@ describe('buildEnhancedSystemPrompt', () => {
       user_prompt_modifier: '',
       temperature: 0.8,
       is_default: true,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
-    
+
     const regenerationOptions: RegenerationOptions = {
       type: 'preset',
-      preset: preset
+      preset: preset,
     };
-    
+
     const prompt = buildEnhancedSystemPrompt(undefined, regenerationOptions);
     expect(prompt).toContain('Focus heavily on technical implementation details');
   });
@@ -215,12 +215,14 @@ describe('buildEnhancedUserPrompt', () => {
     title: 'Add new feature',
     description: 'This PR adds a new feature',
     commits: [
-      { message: 'Initial implementation', sha: 'abc123', url: 'https://github.com/owner/repo/commit/abc123' },
-      { message: 'Add tests', sha: 'def456', url: 'https://github.com/owner/repo/commit/def456' }
+      {
+        message: 'Initial implementation',
+        sha: 'abc123',
+        url: 'https://github.com/owner/repo/commit/abc123',
+      },
+      { message: 'Add tests', sha: 'def456', url: 'https://github.com/owner/repo/commit/def456' },
     ],
-    files: [
-      { filename: 'src/feature.ts', additions: 50, deletions: 10, status: 'modified' }
-    ]
+    files: [{ filename: 'src/feature.ts', additions: 50, deletions: 10, status: 'modified' }],
   };
 
   it('should build basic user prompt', () => {
@@ -242,10 +244,10 @@ describe('buildEnhancedUserPrompt', () => {
         user_prompt_modifier: 'Make this much shorter and more concise.',
         temperature: 0.5,
         is_default: true,
-        created_at: new Date().toISOString()
-      }
+        created_at: new Date().toISOString(),
+      },
     };
-    
+
     const prompt = buildEnhancedUserPrompt(mockPRData, regenerationOptions);
     expect(prompt).toContain('Make this much shorter and more concise');
   });
@@ -253,9 +255,9 @@ describe('buildEnhancedUserPrompt', () => {
   it('should apply custom prompt modifications', () => {
     const regenerationOptions: RegenerationOptions = {
       type: 'custom',
-      customPrompt: 'Focus on security implications of these changes.'
+      customPrompt: 'Focus on security implications of these changes.',
     };
-    
+
     const prompt = buildEnhancedUserPrompt(mockPRData, regenerationOptions);
     expect(prompt).toContain('Focus on security implications');
   });
@@ -277,8 +279,8 @@ describe('getTemperature', () => {
         user_prompt_modifier: '',
         temperature: 0.9,
         is_default: false,
-        created_at: new Date().toISOString()
-      }
+        created_at: new Date().toISOString(),
+      },
     };
     expect(getTemperature(options)).toBe(0.9);
   });
@@ -295,8 +297,8 @@ describe('getTemperature', () => {
         user_prompt_modifier: '',
         temperature: 0.9,
         is_default: false,
-        created_at: new Date().toISOString()
-      }
+        created_at: new Date().toISOString(),
+      },
     };
     expect(getTemperature(options)).toBe(0.3);
   });

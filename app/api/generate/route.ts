@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
-import OpenAI from "openai";
-import { Octokit } from "octokit";
+import { NextResponse } from 'next/server';
+import OpenAI from 'openai';
+import { Octokit } from 'octokit';
 
 // Initialize Octokit
 const octokit = new Octokit({
@@ -10,7 +10,7 @@ const octokit = new Octokit({
 function extractPRInfo(url: string) {
   const match = url.match(/github\.com\/([^/]+)\/([^/]+)\/pull\/(\d+)/);
   if (!match) {
-    throw new Error("Invalid GitHub PR URL");
+    throw new Error('Invalid GitHub PR URL');
   }
   return {
     owner: match[1],
@@ -45,13 +45,13 @@ async function fetchPRData(prUrl: string) {
 
   return {
     title: pr.title,
-    description: pr.body || "",
-    commits: commits.map(commit => ({
+    description: pr.body || '',
+    commits: commits.map((commit) => ({
       message: commit.commit.message,
       sha: commit.sha,
       url: commit.html_url,
     })),
-    files: files.map(file => ({
+    files: files.map((file) => ({
       filename: file.filename,
       status: file.status,
       additions: file.additions,
@@ -60,8 +60,8 @@ async function fetchPRData(prUrl: string) {
       patch: file.patch,
     })),
     author: {
-      login: pr.user?.login || "",
-      avatar: pr.user?.avatar_url || "",
+      login: pr.user?.login || '',
+      avatar: pr.user?.avatar_url || '',
     },
     created_at: pr.created_at,
     updated_at: pr.updated_at,
@@ -73,10 +73,7 @@ export async function POST(req: Request) {
     const { prUrl, systemPrompt, userPrompt, temperature } = await req.json();
 
     if (!process.env.GITHUB_TOKEN) {
-      return NextResponse.json(
-        { error: "GitHub token not configured" },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'GitHub token not configured' }, { status: 500 });
     }
 
     const prData = await fetchPRData(prUrl);
@@ -84,10 +81,7 @@ export async function POST(req: Request) {
     // If systemPrompt and userPrompt are provided, generate content
     if (systemPrompt && userPrompt) {
       if (!process.env.OPENAI_API_KEY) {
-        return NextResponse.json(
-          { error: "OpenAI API key not configured" },
-          { status: 500 }
-        );
+        return NextResponse.json({ error: 'OpenAI API key not configured' }, { status: 500 });
       }
 
       const openai = new OpenAI({
@@ -96,10 +90,10 @@ export async function POST(req: Request) {
 
       const completion = await openai.chat.completions.create({
         messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
         ],
-        model: "gpt-4o",
+        model: 'gpt-4o',
         temperature: temperature || 0.7,
         max_tokens: 2000,
       });
@@ -117,16 +111,10 @@ export async function POST(req: Request) {
       prData,
     });
   } catch (error) {
-    console.error("Error generating blog post:", error);
-    if (error instanceof Error && error.message === "Invalid GitHub PR URL") {
-      return NextResponse.json(
-        { error: "Invalid GitHub PR URL format" },
-        { status: 400 }
-      );
+    console.error('Error generating blog post:', error);
+    if (error instanceof Error && error.message === 'Invalid GitHub PR URL') {
+      return NextResponse.json({ error: 'Invalid GitHub PR URL format' }, { status: 400 });
     }
-    return NextResponse.json(
-      { error: "Failed to generate blog post" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to generate blog post' }, { status: 500 });
   }
 }

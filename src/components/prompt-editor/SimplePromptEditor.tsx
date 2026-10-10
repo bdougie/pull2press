@@ -18,15 +18,15 @@ export function SimplePromptEditor({ children, onTextReplace }: SimplePromptEdit
       // Check for Cmd+J (Mac) or Ctrl+J (Windows/Linux)
       if ((e.metaKey || e.ctrlKey) && e.key === 'j') {
         e.preventDefault();
-        
+
         const selection = window.getSelection();
         const text = selection?.toString().trim();
-        
+
         if (text && text.length > 0) {
           // Check if all text is selected
           const textarea = containerRef.current?.querySelector('textarea');
           const isAll = textarea && textarea.value.trim() === text;
-          
+
           setSelectedText(text);
           setIsAllTextSelected(isAll || false);
           setShowSidebar(true);
@@ -74,7 +74,7 @@ export function SimplePromptEditor({ children, onTextReplace }: SimplePromptEdit
       <div ref={containerRef} className="prompt-editor-container">
         {children}
       </div>
-      
+
       {createPortal(
         <PromptEditorSidebar
           selectedText={selectedText}

@@ -2,7 +2,7 @@ import { generateBlogPost as generateOpenAIBlogPost } from './openai';
 import { generateBlogPost as generateOllamaBlogPost, isOllamaAvailable } from './ollama';
 
 // Function to choose the appropriate generator based on environment
-export async function generateBlogPost(prData: any) {
+export async function generateBlogPost(prData: Record<string, unknown>) {
   // In development or local environment, try to use Ollama first
   // run: DEV=false npm run dev to test OpenAI locally
   if (import.meta.env.DEV) {
@@ -15,10 +15,9 @@ export async function generateBlogPost(prData: any) {
       console.warn('Ollama not available, falling back to OpenAI:', error);
     }
   }
-  
+
   // Always use OpenAI for testing
   return generateOpenAIBlogPost(prData);
 }
 
 export { generateOpenAIBlogPost, generateOllamaBlogPost, isOllamaAvailable };
-

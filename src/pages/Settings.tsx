@@ -2,7 +2,13 @@ import { useState, useEffect } from 'react';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { Textarea } from '../../components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../components/ui/select';
 import { Badge } from '../../components/ui/badge';
 import { Trash2, Plus, ArrowLeft } from 'lucide-react';
 import { supabase } from '../lib/supabase';
@@ -32,7 +38,8 @@ export default function Settings({ user }: { user: any }) {
         .eq('user_id', user.id)
         .single();
 
-      if (error && error.code !== 'PGRST116') { // PGRST116 = not found
+      if (error && error.code !== 'PGRST116') {
+        // PGRST116 = not found
         console.error('Error loading preferences:', error);
         return;
       }
@@ -46,7 +53,7 @@ export default function Settings({ user }: { user: any }) {
           writing_samples: [],
           preferred_tone: 'professional',
           preferred_length: 'medium',
-          custom_instructions: ''
+          custom_instructions: '',
         };
         setPreferences(defaultPrefs as UserPreferences);
       }
@@ -59,19 +66,17 @@ export default function Settings({ user }: { user: any }) {
 
   const handleSave = async () => {
     if (!preferences || !user) return;
-    
+
     setIsSaving(true);
     try {
-      const { error } = await supabase
-        .from('user_preferences')
-        .upsert({
-          user_id: user.id,
-          writing_samples: preferences.writing_samples,
-          preferred_tone: preferences.preferred_tone,
-          preferred_length: preferences.preferred_length,
-          custom_instructions: preferences.custom_instructions,
-          updated_at: new Date().toISOString()
-        });
+      const { error } = await supabase.from('user_preferences').upsert({
+        user_id: user.id,
+        writing_samples: preferences.writing_samples,
+        preferred_tone: preferences.preferred_tone,
+        preferred_length: preferences.preferred_length,
+        custom_instructions: preferences.custom_instructions,
+        updated_at: new Date().toISOString(),
+      });
 
       if (error) {
         console.error('Error saving preferences:', error);
@@ -89,20 +94,20 @@ export default function Settings({ user }: { user: any }) {
 
   const addWritingSample = () => {
     if (!newSample.trim() || !preferences) return;
-    
+
     setPreferences({
       ...preferences,
-      writing_samples: [...preferences.writing_samples, newSample.trim()]
+      writing_samples: [...preferences.writing_samples, newSample.trim()],
     });
     setNewSample('');
   };
 
   const removeWritingSample = (index: number) => {
     if (!preferences) return;
-    
+
     setPreferences({
       ...preferences,
-      writing_samples: preferences.writing_samples.filter((_, i) => i !== index)
+      writing_samples: preferences.writing_samples.filter((_, i) => i !== index),
     });
   };
 
@@ -167,7 +172,7 @@ export default function Settings({ user }: { user: any }) {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium mb-2">Preferred Length</label>
                 <Select
@@ -209,20 +214,22 @@ export default function Settings({ user }: { user: any }) {
           <Card className="p-6">
             <h2 className="text-lg font-semibold mb-4">Writing Samples</h2>
             <p className="text-sm text-muted-foreground mb-4">
-              Add examples of your writing to help the AI match your style. Include blog posts, 
+              Add examples of your writing to help the AI match your style. Include blog posts,
               documentation, or any technical content you've written.
             </p>
-            
+
             <div className="space-y-4">
               <div className="flex gap-2">
                 <Textarea
                   placeholder="Paste a sample of your writing here..."
                   value={newSample}
-                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNewSample(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                    setNewSample(e.target.value)
+                  }
                   className="flex-1"
                   rows={3}
                 />
-                <Button 
+                <Button
                   onClick={addWritingSample}
                   disabled={!newSample.trim()}
                   className="self-start"
@@ -231,10 +238,12 @@ export default function Settings({ user }: { user: any }) {
                   Add Sample
                 </Button>
               </div>
-              
+
               {preferences.writing_samples.length > 0 && (
                 <div className="space-y-3">
-                  <h3 className="text-sm font-medium">Your Writing Samples ({preferences.writing_samples.length})</h3>
+                  <h3 className="text-sm font-medium">
+                    Your Writing Samples ({preferences.writing_samples.length})
+                  </h3>
                   {preferences.writing_samples.map((sample, index) => (
                     <div key={index} className="border rounded-lg p-4 bg-muted/50">
                       <div className="flex justify-between items-start gap-2">
@@ -242,9 +251,7 @@ export default function Settings({ user }: { user: any }) {
                           <Badge variant="secondary" className="mb-2">
                             Sample {index + 1}
                           </Badge>
-                          <p className="text-sm whitespace-pre-wrap line-clamp-3">
-                            {sample}
-                          </p>
+                          <p className="text-sm whitespace-pre-wrap line-clamp-3">{sample}</p>
                         </div>
                         <Button
                           variant="ghost"
@@ -264,12 +271,12 @@ export default function Settings({ user }: { user: any }) {
 
           {/* Save Button */}
           <div className="flex justify-end">
-            <Button 
+            <Button
               onClick={handleSave}
               disabled={isSaving}
               style={{ backgroundColor: '#2da44e', color: 'white' }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2c974b'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2da44e'}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#2c974b')}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#2da44e')}
             >
               {isSaving ? 'Saving...' : 'Save Preferences'}
             </Button>

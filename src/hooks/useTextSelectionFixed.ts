@@ -16,7 +16,7 @@ export function useTextSelectionFixed() {
 
   const updateSelection = useCallback(() => {
     const sel = window.getSelection();
-    
+
     if (!sel || sel.rangeCount === 0 || sel.isCollapsed) {
       if (lastSelectionRef.current) {
         lastSelectionRef.current = '';
@@ -26,7 +26,7 @@ export function useTextSelectionFixed() {
     }
 
     const text = sel.toString().trim();
-    
+
     // Only update if selection actually changed
     if (!text || text === lastSelectionRef.current) {
       return;
@@ -34,23 +34,23 @@ export function useTextSelectionFixed() {
 
     try {
       const range = sel.getRangeAt(0);
-      
+
       // Create a temporary span to get accurate position
       const span = document.createElement('span');
       span.style.position = 'absolute';
       span.style.visibility = 'hidden';
-      
+
       // Clone the range and collapse to end
       const endRange = range.cloneRange();
       endRange.collapse(false);
-      
+
       // Insert the span at the end of selection
       endRange.insertNode(span);
       const rect = span.getBoundingClientRect();
-      
+
       // Clean up
       span.remove();
-      
+
       // If we got a valid rect, use it
       if (rect.width > 0 || rect.height > 0) {
         lastSelectionRef.current = text;

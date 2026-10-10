@@ -29,10 +29,10 @@ async function testPerformance(prUrl: string): Promise<PerformanceMetrics> {
   console.log(`\n🔍 Testing performance for: ${prUrl}`);
   console.log('━'.repeat(60));
 
-  const octokit = new Octokit({ 
-    auth: process.env.GITHUB_TOKEN 
+  const octokit = new Octokit({
+    auth: process.env.GITHUB_TOKEN,
   });
-  
+
   const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
   });
@@ -43,7 +43,7 @@ async function testPerformance(prUrl: string): Promise<PerformanceMetrics> {
   // Test sequential fetching (current implementation)
   console.log('\n📊 Sequential Fetching:');
   const startFetch = performance.now();
-  
+
   const startPR = performance.now();
   const { data: pr } = await octokit.rest.pulls.get({
     owner,
@@ -77,46 +77,54 @@ async function testPerformance(prUrl: string): Promise<PerformanceMetrics> {
   // Test parallel fetching (optimized)
   console.log('\n⚡ Parallel Fetching (Optimized):');
   const startParallel = performance.now();
-  
+
   const [prDataParallel, commitsParallel, filesParallel] = await Promise.all([
     octokit.rest.pulls.get({ owner, repo, pull_number }),
     octokit.rest.pulls.listCommits({ owner, repo, pull_number }),
     octokit.rest.pulls.listFiles({ owner, repo, pull_number }),
   ]);
-  
+
   const parallelTime = performance.now() - startParallel;
   console.log(`   ✓ All data fetched in parallel: ${(parallelTime / 1000).toFixed(2)}s`);
-  console.log(`   🎯 Speed improvement: ${((totalFetchTime - parallelTime) / 1000).toFixed(2)}s faster (${((1 - parallelTime/totalFetchTime) * 100).toFixed(0)}% improvement)`);
+  console.log(
+    `   🎯 Speed improvement: ${((totalFetchTime - parallelTime) / 1000).toFixed(2)}s faster (${((1 - parallelTime / totalFetchTime) * 100).toFixed(0)}% improvement)`
+  );
 
   // Test content generation
   console.log('\n🤖 Content Generation:');
   const startGenerate = performance.now();
-  
+
   const prData = {
     title: pr.title,
     description: pr.body || '',
-    commits: commits.slice(0, 10).map(c => c.commit.message).join('\n'),
+    commits: commits
+      .slice(0, 10)
+      .map((c) => c.commit.message)
+      .join('\n'),
     filesChanged: files.length,
     additions: files.reduce((sum, f) => sum + f.additions, 0),
     deletions: files.reduce((sum, f) => sum + f.deletions, 0),
   };
 
-  const systemPrompt = "You are a technical blog post writer. Transform pull request data into an engaging developer blog post.";
+  const systemPrompt =
+    'You are a technical blog post writer. Transform pull request data into an engaging developer blog post.';
   const userPrompt = `Write a blog post about this PR:\nTitle: ${prData.title}\nDescription: ${prData.description}\nFiles changed: ${prData.filesChanged}\nAdditions: ${prData.additions}\nDeletions: ${prData.deletions}`;
 
   const completion = await openai.chat.completions.create({
     messages: [
-      { role: "system", content: systemPrompt },
-      { role: "user", content: userPrompt }
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt },
     ],
-    model: "gpt-4o",
+    model: 'gpt-4o',
     temperature: 0.7,
     max_tokens: 2000,
   });
 
   const generateTime = performance.now() - startGenerate;
   console.log(`   ✓ Content generated: ${(generateTime / 1000).toFixed(2)}s`);
-  console.log(`   ✓ Content length: ${completion.choices[0].message.content?.length || 0} characters`);
+  console.log(
+    `   ✓ Content length: ${completion.choices[0].message.content?.length || 0} characters`
+  );
 
   const totalTime = performance.now() - startTotal;
 
@@ -146,7 +154,7 @@ async function main() {
   }
 
   const testUrl = process.argv[2] || 'https://github.com/bdougie/dinnerpeople/pull/21';
-  
+
   try {
     await testPerformance(testUrl);
   } catch (error) {

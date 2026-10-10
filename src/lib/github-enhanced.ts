@@ -18,12 +18,14 @@ export async function fetchPRDataEnhanced(
   prUrl: string,
   onProgress?: (progress: EnhancedFetchProgress) => void
 ) {
-  const { data: { session } } = await supabase.auth.getSession();
-  
-  const octokit = session?.provider_token 
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  const octokit = session?.provider_token
     ? new Octokit({ auth: session.provider_token })
     : new Octokit();
-  
+
   const { owner, repo, pull_number } = extractPRInfo(prUrl);
 
   try {
@@ -31,16 +33,16 @@ export async function fetchPRDataEnhanced(
     onProgress?.({
       stage: 'pr_details',
       progress: 5,
-      message: 'Connecting to GitHub...'
+      message: 'Connecting to GitHub...',
     });
 
     // Fetch PR details first
     const pr = await octokit.rest.pulls.get({ owner, repo, pull_number });
-    
+
     onProgress?.({
       stage: 'pr_details',
       progress: 15,
-      message: 'Fetching pull request details...'
+      message: 'Fetching pull request details...',
     });
 
     // Fetch comments
@@ -49,37 +51,37 @@ export async function fetchPRDataEnhanced(
       progress: 20,
       message: 'Looking at comments...',
       details: {
-        isAnalyzingComments: true
-      }
+        isAnalyzingComments: true,
+      },
     });
 
     const [comments, reviews] = await Promise.all([
       octokit.rest.issues.listComments({ owner, repo, issue_number: pull_number }),
-      octokit.rest.pulls.listReviews({ owner, repo, pull_number })
+      octokit.rest.pulls.listReviews({ owner, repo, pull_number }),
     ]);
 
     onProgress?.({
       stage: 'commits',
       progress: 30,
-      message: 'Analyzing commits...'
+      message: 'Analyzing commits...',
     });
 
     // Fetch commits
     const commits = await octokit.rest.pulls.listCommits({ owner, repo, pull_number });
-    
+
     // Report progress for each commit
     const processedCommits = [];
     for (let i = 0; i < Math.min(commits.data.length, 20); i++) {
       const commit = commits.data[i];
-      
+
       onProgress?.({
         stage: 'commits',
         progress: 30 + (i / Math.min(commits.data.length, 20)) * 15,
         message: `Analyzing commit ${i + 1} of ${commits.data.length}`,
         details: {
           currentCommit: i + 1,
-          commitCount: commits.data.length
-        }
+          commitCount: commits.data.length,
+        },
       });
 
       processedCommits.push({
@@ -92,19 +94,19 @@ export async function fetchPRDataEnhanced(
     onProgress?.({
       stage: 'files',
       progress: 45,
-      message: 'Processing changed files...'
+      message: 'Processing changed files...',
     });
 
     // Fetch files
     const files = await octokit.rest.pulls.listFiles({ owner, repo, pull_number });
-    
+
     // Report progress for each file
     const processedFiles = [];
     const filesToProcess = Math.min(files.data.length, 50);
-    
+
     for (let i = 0; i < filesToProcess; i++) {
       const file = files.data[i];
-      
+
       onProgress?.({
         stage: 'files',
         progress: 45 + (i / filesToProcess) * 30,
@@ -112,12 +114,12 @@ export async function fetchPRDataEnhanced(
         details: {
           currentFile: file.filename,
           totalFiles: files.data.length,
-          currentFileIndex: i + 1
-        }
+          currentFileIndex: i + 1,
+        },
       });
 
       // Simulate processing time for each file
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       processedFiles.push({
         filename: file.filename,
@@ -132,21 +134,21 @@ export async function fetchPRDataEnhanced(
     onProgress?.({
       stage: 'generating',
       progress: 80,
-      message: 'Preparing content generation...'
+      message: 'Preparing content generation...',
     });
 
     // Process comments and reviews
-    const processedComments = comments.data.slice(0, 10).map(comment => ({
+    const processedComments = comments.data.slice(0, 10).map((comment) => ({
       body: comment.body,
       user: comment.user?.login || 'unknown',
-      created_at: comment.created_at
+      created_at: comment.created_at,
     }));
 
-    const processedReviews = reviews.data.slice(0, 10).map(review => ({
+    const processedReviews = reviews.data.slice(0, 10).map((review) => ({
       body: review.body,
       state: review.state,
       user: review.user?.login || 'unknown',
-      submitted_at: review.submitted_at
+      submitted_at: review.submitted_at,
     }));
 
     return {
@@ -170,7 +172,7 @@ export async function fetchPRDataEnhanced(
         totalReviews: reviews.data.length,
         additions: files.data.reduce((sum, f) => sum + f.additions, 0),
         deletions: files.data.reduce((sum, f) => sum + f.deletions, 0),
-      }
+      },
     };
   } catch (error) {
     console.error('Error fetching PR data:', error);

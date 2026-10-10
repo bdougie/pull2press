@@ -1,12 +1,15 @@
-import { Button } from "../components/ui/button";
-import { Card } from "../components/ui/card";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { fetchPRDataEnhanced } from "../lib/github-enhanced";
-import { generateBlogPost } from "../lib/openai";
-import { supabase } from "../lib/supabase";
-import { EnhancedLoadingProgress, EnhancedFetchProgress } from "../components/enhanced-loading-progress";
-import type { User } from "../types/user";
+import { Button } from '../components/ui/button';
+import { Card } from '../components/ui/card';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { fetchPRDataEnhanced } from '../lib/github-enhanced';
+import { generateBlogPost } from '../lib/openai';
+import { supabase } from '../lib/supabase';
+import {
+  EnhancedLoadingProgress,
+  EnhancedFetchProgress,
+} from '../components/enhanced-loading-progress';
+import type { User } from '../types/user';
 
 export default function HomeEnhanced({ user }: { user: User | null }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -14,7 +17,7 @@ export default function HomeEnhanced({ user }: { user: User | null }) {
   const [progress, setProgress] = useState<EnhancedFetchProgress>({
     stage: 'pr_details',
     progress: 0,
-    message: 'Starting...'
+    message: 'Starting...',
   });
   const navigate = useNavigate();
 
@@ -24,7 +27,7 @@ export default function HomeEnhanced({ user }: { user: User | null }) {
     setError(null);
 
     const formData = new FormData(e.currentTarget);
-    const prUrl = formData.get("pr-url") as string;
+    const prUrl = formData.get('pr-url') as string;
 
     try {
       // If user is logged in, check cache first
@@ -32,25 +35,25 @@ export default function HomeEnhanced({ user }: { user: User | null }) {
         setProgress({
           stage: 'pr_details',
           progress: 5,
-          message: 'Checking cache...'
+          message: 'Checking cache...',
         });
 
         const { data: existingPosts } = await supabase
-          .from("cached_posts")
-          .select("*")
-          .eq("pr_url", prUrl)
-          .eq("user_id", user.id);
+          .from('cached_posts')
+          .select('*')
+          .eq('pr_url', prUrl)
+          .eq('user_id', user.id);
 
         if (existingPosts && existingPosts.length > 0) {
           setProgress({
             stage: 'complete',
             progress: 100,
-            message: 'Found cached content!'
+            message: 'Found cached content!',
           });
-          
+
           // Small delay for user to see the complete state
-          await new Promise(resolve => setTimeout(resolve, 500));
-          
+          await new Promise((resolve) => setTimeout(resolve, 500));
+
           navigate(`/edit/${existingPosts[0].id}`);
           return;
         }
@@ -58,11 +61,11 @@ export default function HomeEnhanced({ user }: { user: User | null }) {
 
       // Generate new content with enhanced progress updates
       const prData = await fetchPRDataEnhanced(prUrl, setProgress);
-      
+
       setProgress({
         stage: 'generating',
         progress: 85,
-        message: 'Creating your blog post with AI...'
+        message: 'Creating your blog post with AI...',
       });
 
       // Provide progressive updates during AI generation to improve UX
@@ -71,11 +74,11 @@ export default function HomeEnhanced({ user }: { user: User | null }) {
           { progress: 87, message: 'Analyzing code changes...' },
           { progress: 89, message: 'Understanding the context...' },
           { progress: 91, message: 'Generating content structure...' },
-          { progress: 93, message: 'Writing the blog post...' }
+          { progress: 93, message: 'Writing the blog post...' },
         ];
 
         let messageIndex = 0;
-        
+
         // Start progress updates
         const progressInterval = setInterval(() => {
           if (messageIndex < statusMessages.length) {
@@ -83,7 +86,7 @@ export default function HomeEnhanced({ user }: { user: User | null }) {
             setProgress({
               stage: 'generating',
               progress: currentStatus.progress,
-              message: currentStatus.message
+              message: currentStatus.message,
             });
             messageIndex++;
           }
@@ -99,7 +102,7 @@ export default function HomeEnhanced({ user }: { user: User | null }) {
           setProgress({
             stage: 'generating',
             progress: 93,
-            message: 'Generation failed. Please try again.'
+            message: 'Generation failed. Please try again.',
           });
           throw error;
         }
@@ -110,23 +113,23 @@ export default function HomeEnhanced({ user }: { user: User | null }) {
       setProgress({
         stage: 'complete',
         progress: 95,
-        message: 'Finalizing blog post...'
+        message: 'Finalizing blog post...',
       });
 
       // Brief pause to show the finalizing message
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
       setProgress({
         stage: 'complete',
         progress: 98,
-        message: 'Saving your content...'
+        message: 'Saving your content...',
       });
 
       // If user is logged in, save to Supabase
       let postId = null;
       if (user) {
         const { data: savedPost, error: saveError } = await supabase
-          .from("cached_posts")
+          .from('cached_posts')
           .insert({
             pr_url: prUrl,
             content,
@@ -137,7 +140,7 @@ export default function HomeEnhanced({ user }: { user: User | null }) {
           .single();
 
         if (saveError) {
-          console.error("Error saving post:", saveError);
+          console.error('Error saving post:', saveError);
         } else if (savedPost) {
           postId = savedPost.id;
         }
@@ -146,26 +149,26 @@ export default function HomeEnhanced({ user }: { user: User | null }) {
       setProgress({
         stage: 'complete',
         progress: 100,
-        message: 'Success! Redirecting to editor...'
+        message: 'Success! Redirecting to editor...',
       });
 
       // Small delay for user to see the complete state
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       // Navigate to edit page with content
       if (postId) {
         navigate(`/edit/${postId}`);
       } else {
         // If not saved (user not logged in or error), navigate with state
-        navigate(`/edit`, { 
-          state: { 
+        navigate(`/edit`, {
+          state: {
             content: content,
-            prUrl: prUrl 
-          } 
+            prUrl: prUrl,
+          },
         });
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      setError(err instanceof Error ? err.message : 'An error occurred');
       setIsLoading(false);
     }
   };
@@ -180,15 +183,12 @@ export default function HomeEnhanced({ user }: { user: User | null }) {
             Transform Your Pull Request into a Blog Post
           </h2>
           <p className="text-gray-600 mb-6">
-            Turn your code commits into engaging developer-friendly blog
-            posts. Simply paste your pull request URL below to get started.
+            Turn your code commits into engaging developer-friendly blog posts. Simply paste your
+            pull request URL below to get started.
           </p>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label
-                htmlFor="pr-url"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
+              <label htmlFor="pr-url" className="block text-sm font-medium text-gray-700 mb-1">
                 Pull Request URL
               </label>
               <input
@@ -211,10 +211,10 @@ export default function HomeEnhanced({ user }: { user: User | null }) {
               disabled={isLoading}
               className="w-full"
               style={{ backgroundColor: '#2da44e', color: 'white' }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2c974b'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2da44e'}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#2c974b')}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#2da44e')}
             >
-              {isLoading ? "Processing..." : "Generate Blog Post"}
+              {isLoading ? 'Processing...' : 'Generate Blog Post'}
             </Button>
           </form>
         </Card>

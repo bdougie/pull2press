@@ -15,103 +15,93 @@ describe('EnhancedMarkdownEditor', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(useToast).mockReturnValue({ toast: mockToast } as any);
+    vi.mocked(useToast).mockReturnValue({
+      toast: mockToast,
+    } as unknown as ReturnType<typeof useToast>);
   });
 
   describe('Markdown Shortcuts', () => {
     it('should make text bold with cmd+b', async () => {
-      render(
-        <EnhancedMarkdownEditor
-          initialContent="hello world"
-          onChange={mockOnChange}
-        />
-      );
+      render(<EnhancedMarkdownEditor initialContent="hello world" onChange={mockOnChange} />);
 
-      const textarea = screen.getByPlaceholderText(/Write your blog post in Markdown/) as HTMLTextAreaElement;
-      
+      const textarea = screen.getByPlaceholderText(
+        /Write your blog post in Markdown/
+      ) as HTMLTextAreaElement;
+
       // Select "world"
       textarea.focus();
       textarea.setSelectionRange(6, 11);
-      
+
       // Press Cmd+B on the textarea
       fireEvent.keyDown(textarea, {
         key: 'b',
         metaKey: true,
-        bubbles: true
+        bubbles: true,
       });
-      
+
       expect(mockOnChange).toHaveBeenCalledWith('hello **world**');
     });
 
     it('should make text italic with cmd+i', async () => {
-      render(
-        <EnhancedMarkdownEditor
-          initialContent="hello world"
-          onChange={mockOnChange}
-        />
-      );
+      render(<EnhancedMarkdownEditor initialContent="hello world" onChange={mockOnChange} />);
 
-      const textarea = screen.getByPlaceholderText(/Write your blog post in Markdown/) as HTMLTextAreaElement;
-      
+      const textarea = screen.getByPlaceholderText(
+        /Write your blog post in Markdown/
+      ) as HTMLTextAreaElement;
+
       // Select "hello"
       textarea.focus();
       textarea.setSelectionRange(0, 5);
-      
+
       // Press Cmd+I on the textarea
       fireEvent.keyDown(textarea, {
         key: 'i',
         metaKey: true,
-        bubbles: true
+        bubbles: true,
       });
-      
+
       expect(mockOnChange).toHaveBeenCalledWith('*hello* world');
     });
 
     it('should insert link syntax with cmd+k when text is selected', async () => {
-      render(
-        <EnhancedMarkdownEditor
-          initialContent="Check out GitHub"
-          onChange={mockOnChange}
-        />
-      );
+      render(<EnhancedMarkdownEditor initialContent="Check out GitHub" onChange={mockOnChange} />);
 
-      const textarea = screen.getByPlaceholderText(/Write your blog post in Markdown/) as HTMLTextAreaElement;
-      
+      const textarea = screen.getByPlaceholderText(
+        /Write your blog post in Markdown/
+      ) as HTMLTextAreaElement;
+
       // Select "GitHub"
       textarea.focus();
       textarea.setSelectionRange(10, 16);
-      
+
       // Press Cmd+K on the textarea
       fireEvent.keyDown(textarea, {
         key: 'k',
         metaKey: true,
-        bubbles: true
+        bubbles: true,
       });
-      
+
       expect(mockOnChange).toHaveBeenCalledWith('Check out [GitHub](url)');
     });
 
     it('should insert empty link syntax with cmd+k when no text is selected', async () => {
-      render(
-        <EnhancedMarkdownEditor
-          initialContent="Hello "
-          onChange={mockOnChange}
-        />
-      );
+      render(<EnhancedMarkdownEditor initialContent="Hello " onChange={mockOnChange} />);
 
-      const textarea = screen.getByPlaceholderText(/Write your blog post in Markdown/) as HTMLTextAreaElement;
-      
+      const textarea = screen.getByPlaceholderText(
+        /Write your blog post in Markdown/
+      ) as HTMLTextAreaElement;
+
       // Position cursor at end
       textarea.focus();
       textarea.setSelectionRange(6, 6);
-      
+
       // Press Cmd+K on the textarea
       fireEvent.keyDown(textarea, {
         key: 'k',
         metaKey: true,
-        bubbles: true
+        bubbles: true,
       });
-      
+
       expect(mockOnChange).toHaveBeenCalledWith('Hello [](url)');
     });
 
@@ -123,19 +113,21 @@ describe('EnhancedMarkdownEditor', () => {
         />
       );
 
-      const textarea = screen.getByPlaceholderText(/Write your blog post in Markdown/) as HTMLTextAreaElement;
-      
+      const textarea = screen.getByPlaceholderText(
+        /Write your blog post in Markdown/
+      ) as HTMLTextAreaElement;
+
       // Select "console.log"
       textarea.focus();
       textarea.setSelectionRange(8, 19);
-      
+
       // Press Alt+` on the textarea
       fireEvent.keyDown(textarea, {
         key: '`',
         altKey: true,
-        bubbles: true
+        bubbles: true,
       });
-      
+
       expect(mockOnChange).toHaveBeenCalledWith('Use the `console.log` function');
     });
   });
@@ -145,7 +137,7 @@ describe('EnhancedMarkdownEditor', () => {
     // These features work in real browsers but are difficult to test properly
     it.skip('should handle image drag and drop', async () => {
       vi.mocked(uploadImage).mockResolvedValue('https://example.com/image.jpg');
-      
+
       render(
         <EnhancedMarkdownEditor
           initialContent=""
@@ -154,67 +146,66 @@ describe('EnhancedMarkdownEditor', () => {
         />
       );
 
-      const dropZone = screen.getByPlaceholderText(/Write your blog post in Markdown/).parentElement!;
+      const dropZone = screen.getByPlaceholderText(
+        /Write your blog post in Markdown/
+      ).parentElement!;
       const file = new File(['image'], 'test.jpg', { type: 'image/jpeg' });
-      
+
       // Simulate drag over
       fireEvent.dragOver(dropZone, {
         dataTransfer: {
           types: ['Files'],
-          files: [file]
-        }
+          files: [file],
+        },
       });
-      
+
       // Should show drag indicator
       expect(dropZone).toHaveClass('bg-blue-50');
-      
+
       // Simulate drop
       fireEvent.drop(dropZone, {
         dataTransfer: {
-          files: [file]
-        }
+          files: [file],
+        },
       });
-      
+
       await waitFor(() => {
         expect(uploadImage).toHaveBeenCalledWith(file);
         expect(mockOnChange).toHaveBeenCalledWith('![test.jpg](https://example.com/image.jpg)');
         expect(mockToast).toHaveBeenCalledWith({
           title: 'Image uploaded',
-          description: 'Image has been uploaded and inserted into your content'
+          description: 'Image has been uploaded and inserted into your content',
         });
       });
     });
 
     it.skip('should reject non-image files', async () => {
-      render(
-        <EnhancedMarkdownEditor
-          initialContent=""
-          onChange={mockOnChange}
-        />
-      );
+      render(<EnhancedMarkdownEditor initialContent="" onChange={mockOnChange} />);
 
-      const dropZone = screen.getByPlaceholderText(/Write your blog post in Markdown/).parentElement!;
+      const dropZone = screen.getByPlaceholderText(
+        /Write your blog post in Markdown/
+      ).parentElement!;
       const file = new File(['document'], 'test.pdf', { type: 'application/pdf' });
-      
+
       fireEvent.drop(dropZone, {
         dataTransfer: {
-          files: [file]
-        }
+          files: [file],
+        },
       });
-      
+
       await waitFor(() => {
         expect(uploadImage).not.toHaveBeenCalled();
         expect(mockToast).toHaveBeenCalledWith({
           title: 'No images found',
           description: 'Please drop image files only',
-          variant: 'destructive'
+          variant: 'destructive',
         });
       });
     });
 
     it.skip('should handle paste image from clipboard', async () => {
       vi.mocked(uploadImage).mockResolvedValue('https://example.com/pasted.jpg');
-      
+
       render(
         <EnhancedMarkdownEditor
           initialContent=""
@@ -225,16 +216,18 @@ describe('EnhancedMarkdownEditor', () => {
 
       const textarea = screen.getByPlaceholderText(/Write your blog post in Markdown/);
       const file = new File(['image'], 'image.png', { type: 'image/png' });
-      
+
       fireEvent.paste(textarea, {
         clipboardData: {
-          items: [{
-            type: 'image/png',
-            getAsFile: () => file
-          }]
-        }
+          items: [
+            {
+              type: 'image/png',
+              getAsFile: () => file,
+            },
+          ],
+        },
       });
-      
+
       await waitFor(() => {
         expect(uploadImage).toHaveBeenCalledWith(file);
         expect(mockOnChange).toHaveBeenCalledWith('![image.png](https://example.com/pasted.jpg)');
@@ -243,7 +236,7 @@ describe('EnhancedMarkdownEditor', () => {
 
     it.skip('should show error when upload fails', async () => {
       vi.mocked(uploadImage).mockRejectedValue(new Error('Upload failed'));
-      
+
       render(
         <EnhancedMarkdownEditor
           initialContent=""
@@ -252,20 +245,22 @@ describe('EnhancedMarkdownEditor', () => {
         />
       );
 
-      const dropZone = screen.getByPlaceholderText(/Write your blog post in Markdown/).parentElement!;
+      const dropZone = screen.getByPlaceholderText(
+        /Write your blog post in Markdown/
+      ).parentElement!;
       const file = new File(['image'], 'test.jpg', { type: 'image/jpeg' });
-      
+
       fireEvent.drop(dropZone, {
         dataTransfer: {
-          files: [file]
-        }
+          files: [file],
+        },
       });
-      
+
       await waitFor(() => {
         expect(mockToast).toHaveBeenCalledWith({
           title: 'Upload failed',
           description: 'Upload failed',
-          variant: 'destructive'
+          variant: 'destructive',
         });
       });
     });
@@ -273,35 +268,20 @@ describe('EnhancedMarkdownEditor', () => {
 
   describe('Save Status Indicator', () => {
     it('should show saving status', () => {
-      render(
-        <EnhancedMarkdownEditor
-          initialContent=""
-          saveStatus="saving"
-        />
-      );
-      
+      render(<EnhancedMarkdownEditor initialContent="" saveStatus="saving" />);
+
       expect(screen.getByText('Saving...')).toBeInTheDocument();
     });
 
     it('should show saved status', () => {
-      render(
-        <EnhancedMarkdownEditor
-          initialContent=""
-          saveStatus="saved"
-        />
-      );
-      
+      render(<EnhancedMarkdownEditor initialContent="" saveStatus="saved" />);
+
       expect(screen.getByText('Saved')).toBeInTheDocument();
     });
 
     it('should show error status', () => {
-      render(
-        <EnhancedMarkdownEditor
-          initialContent=""
-          saveStatus="error"
-        />
-      );
-      
+      render(<EnhancedMarkdownEditor initialContent="" saveStatus="error" />);
+
       expect(screen.getByText('Error saving')).toBeInTheDocument();
     });
   });
@@ -309,15 +289,11 @@ describe('EnhancedMarkdownEditor', () => {
   describe('Keyboard Shortcuts Dialog', () => {
     it('should open shortcuts dialog when clicking help link', async () => {
       const user = userEvent.setup();
-      render(
-        <EnhancedMarkdownEditor
-          initialContent=""
-        />
-      );
-      
+      render(<EnhancedMarkdownEditor initialContent="" />);
+
       const shortcutsLink = screen.getByText('Keyboard shortcuts');
       await user.click(shortcutsLink);
-      
+
       // Check dialog content
       expect(screen.getByText('Keyboard Shortcuts')).toBeInTheDocument();
       expect(screen.getByText('Cmd+B')).toBeInTheDocument();
@@ -336,16 +312,13 @@ describe('EnhancedMarkdownEditor', () => {
   describe('Content Changes', () => {
     it('should call onChange when content is typed', async () => {
       const user = userEvent.setup();
-      render(
-        <EnhancedMarkdownEditor
-          initialContent="Hello"
-          onChange={mockOnChange}
-        />
-      );
-      
-      const textarea = screen.getByPlaceholderText(/Write your blog post in Markdown/) as HTMLTextAreaElement;
+      render(<EnhancedMarkdownEditor initialContent="Hello" onChange={mockOnChange} />);
+
+      const textarea = screen.getByPlaceholderText(
+        /Write your blog post in Markdown/
+      ) as HTMLTextAreaElement;
       await user.type(textarea, ' World');
-      
+
       expect(mockOnChange).toHaveBeenLastCalledWith('Hello World');
     });
   });

@@ -12,16 +12,16 @@ vi.mock('../lib/supabase', () => ({
     from: vi.fn(() => ({
       select: vi.fn(() => ({
         eq: vi.fn(() => ({
-          single: vi.fn(() => Promise.resolve({ data: null, error: null }))
-        }))
+          single: vi.fn(() => Promise.resolve({ data: null, error: null })),
+        })),
       })),
       insert: vi.fn(() => Promise.resolve({ error: null })),
       update: vi.fn(() => ({
-        eq: vi.fn(() => Promise.resolve({ error: null }))
+        eq: vi.fn(() => Promise.resolve({ error: null })),
       })),
-      upsert: vi.fn(() => Promise.resolve({ error: null }))
-    }))
-  }
+      upsert: vi.fn(() => Promise.resolve({ error: null })),
+    })),
+  },
 }));
 
 // Mock window.alert
@@ -33,25 +33,25 @@ vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
   return {
     ...actual,
-    useNavigate: () => mockNavigate
+    useNavigate: () => mockNavigate,
   };
 });
 
 describe('Settings Page', () => {
   const mockUser = { id: 'user123', email: 'test@example.com' };
-  
+
   const mockPreferences: UserPreferences = {
     id: 'pref123',
     user_id: 'user123',
     writing_samples: [
       'This is my first writing sample.',
-      'Here is another example of my writing style.'
+      'Here is another example of my writing style.',
     ],
     preferred_tone: 'professional',
     preferred_length: 'medium',
     custom_instructions: 'Always be concise',
     created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
+    updated_at: new Date().toISOString(),
   };
 
   beforeEach(() => {
@@ -76,11 +76,11 @@ describe('Settings Page', () => {
         eq: vi.fn().mockReturnValue({
           single: vi.fn().mockResolvedValue({
             data: mockPreferences,
-            error: null
-          })
-        })
-      })
-    } as any);
+            error: null,
+          }),
+        }),
+      }),
+    } as unknown as ReturnType<typeof supabase.from>);
 
     renderSettings();
 
@@ -99,11 +99,11 @@ describe('Settings Page', () => {
         eq: vi.fn().mockReturnValue({
           single: vi.fn().mockResolvedValue({
             data: null,
-            error: { code: 'PGRST116' }
-          })
-        })
+            error: { code: 'PGRST116' },
+          }),
+        }),
       }),
-      insert: vi.fn().mockResolvedValue({ error: null })
+      insert: vi.fn().mockResolvedValue({ error: null }),
     } as any);
 
     renderSettings();
@@ -143,19 +143,19 @@ describe('Settings Page', () => {
   it('should handle save errors gracefully', async () => {
     const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const alertSpy = vi.spyOn(global, 'alert').mockImplementation(() => {});
-    
+
     vi.mocked(supabase.from).mockReturnValue({
       select: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
           single: vi.fn().mockResolvedValue({
             data: mockPreferences,
-            error: null
-          })
-        })
+            error: null,
+          }),
+        }),
       }),
-      upsert: vi.fn().mockResolvedValue({ 
-        error: { message: 'Failed to save' } 
-      })
+      upsert: vi.fn().mockResolvedValue({
+        error: { message: 'Failed to save' },
+      }),
     } as any);
 
     const user = userEvent.setup();

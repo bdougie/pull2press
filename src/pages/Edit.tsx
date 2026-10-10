@@ -1,21 +1,25 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-import EnhancedMarkdownEditor from "../components/enhanced-markdown-editor";
-import { generateBlogPost } from "../lib/openai";
-import { fetchPRDataEnhanced } from "../lib/github-enhanced";
-import { supabase } from "../lib/supabase";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { Button } from "../components/ui/button";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { useState, useEffect, useCallback, useRef } from 'react';
+import EnhancedMarkdownEditor from '../components/enhanced-markdown-editor';
+import { generateBlogPost } from '../lib/openai';
+import { fetchPRDataEnhanced } from '../lib/github-enhanced';
+import { supabase } from '../lib/supabase';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Button } from '../components/ui/button';
+import { ArrowLeft, ExternalLink } from 'lucide-react';
 import {
   buildEnhancedSystemPrompt,
   buildEnhancedUserPrompt,
   getTemperature,
   type RegenerationPreset,
-  type UserPreferences
-} from "../lib/enhanced-prompt-utils";
-import { EnhancedLoadingProgress, EnhancedFetchProgress } from "../components/enhanced-loading-progress";
+  type UserPreferences,
+} from '../lib/enhanced-prompt-utils';
+import {
+  EnhancedLoadingProgress,
+  EnhancedFetchProgress,
+} from '../components/enhanced-loading-progress';
+import type { User } from '../types/user';
 
-export default function Edit({ user }: { user: any }) {
+export default function Edit({ user }: { user: User | null }) {
   const [blogContent, setBlogContent] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [currentPrUrl, setCurrentPrUrl] = useState<string | null>(null);
@@ -25,7 +29,7 @@ export default function Edit({ user }: { user: any }) {
     stage: 'pr_details',
     progress: 0,
     message: '',
-    details: undefined
+    details: undefined,
   });
   const location = useLocation();
   const navigate = useNavigate();
@@ -38,14 +42,14 @@ export default function Edit({ user }: { user: any }) {
       try {
         // Fetch post from Supabase by ID
         const { data, error } = await supabase
-          .from("cached_posts")
-          .select("*")
-          .eq("id", id)
+          .from('cached_posts')
+          .select('*')
+          .eq('id', id)
           .single();
 
         if (error) {
-          console.error("Error fetching post:", error);
-          navigate("/");
+          console.error('Error fetching post:', error);
+          navigate('/');
           return;
         }
 
@@ -55,11 +59,11 @@ export default function Edit({ user }: { user: any }) {
           setPostId(data.id);
         } else {
           // Post not found
-          navigate("/");
+          navigate('/');
         }
       } catch (err) {
-        console.error("Error:", err);
-        navigate("/");
+        console.error('Error:', err);
+        navigate('/');
       } finally {
         setIsLoading(false);
       }
@@ -76,19 +80,19 @@ export default function Edit({ user }: { user: any }) {
       try {
         // Create a new draft post
         const { data, error } = await supabase
-          .from("cached_posts")
+          .from('cached_posts')
           .insert({
             pr_url: prUrl,
-            title: "Draft",
+            title: 'Draft',
             content: content,
             user_id: user.id,
-            is_draft: true
+            is_draft: true,
           })
           .select()
           .single();
 
         if (error) {
-          console.error("Error creating draft:", error);
+          console.error('Error creating draft:', error);
           // Still set the content even if save fails
           setBlogContent(content);
           setCurrentPrUrl(prUrl);
@@ -103,7 +107,7 @@ export default function Edit({ user }: { user: any }) {
           setPostId(data.id);
         }
       } catch (err) {
-        console.error("Error creating draft:", err);
+        console.error('Error creating draft:', err);
         setBlogContent(content);
         setCurrentPrUrl(prUrl);
       }
@@ -121,7 +125,7 @@ export default function Edit({ user }: { user: any }) {
         createNewDraft(state.content, state.prUrl);
       } else {
         // No content or ID, redirect to home
-        navigate("/");
+        navigate('/');
       }
     }
   }, [params.id, location, navigate, user]);
@@ -139,98 +143,104 @@ export default function Edit({ user }: { user: any }) {
         stage: 'pr_details',
         progress: 0,
         message: 'Fetching PR data...',
-        details: undefined
+        details: undefined,
       });
-      
+
       const prData = await fetchPRDataEnhanced(currentPrUrl, (progressUpdate) => {
         setProgress(progressUpdate);
       });
-      
+
       let userPreferences: UserPreferences | undefined;
-      
+
       // Load user preferences if needed
       if (user && (options?.useUserStyle || !options)) {
         try {
           const { data } = await supabase
-            .from("user_preferences")
-            .select("*")
-            .eq("user_id", user.id)
+            .from('user_preferences')
+            .select('*')
+            .eq('user_id', user.id)
             .single();
-          
+
           if (data) {
             userPreferences = data;
           }
         } catch (err) {
-          console.error("Error loading user preferences:", err);
+          console.error('Error loading user preferences:', err);
         }
       }
-      
+
       // Build enhanced prompts
       const regenerationOptions = {
-        type: (options?.preset ? 'preset' : options?.customPrompt ? 'custom' : options?.useUserStyle ? 'user_style' : 'preset') as 'preset' | 'custom' | 'user_style',
+        type: (options?.preset
+          ? 'preset'
+          : options?.customPrompt
+            ? 'custom'
+            : options?.useUserStyle
+              ? 'user_style'
+              : 'preset') as 'preset' | 'custom' | 'user_style',
         preset: options?.preset,
         customPrompt: options?.customPrompt,
         userPreferences,
-        temperature: options?.preset?.temperature
+        temperature: options?.preset?.temperature,
       };
-      
+
       const systemPrompt = buildEnhancedSystemPrompt(userPreferences, regenerationOptions);
       const userPrompt = buildEnhancedUserPrompt(prData, regenerationOptions);
       const temperature = getTemperature(regenerationOptions);
-      
+
       // Generate with enhanced prompts
       setProgress({
         stage: 'generating',
         progress: 90,
         message: 'Generating blog post...',
-        details: undefined
+        details: undefined,
       });
-      
+
       const content = await generateBlogPost(prData, {
         systemPrompt,
         userPrompt,
-        temperature
+        temperature,
       });
 
       // Update in Supabase if user is logged in
       if (user) {
         const updateQuery = postId
-          ? supabase.from("cached_posts").update({ content }).eq("id", postId)
+          ? supabase.from('cached_posts').update({ content }).eq('id', postId)
           : supabase
-              .from("cached_posts")
+              .from('cached_posts')
               .update({ content })
-              .eq("pr_url", currentPrUrl)
-              .eq("user_id", user.id);
+              .eq('pr_url', currentPrUrl)
+              .eq('user_id', user.id);
 
         const { error: updateError } = await updateQuery;
 
         if (updateError) {
-          console.error("Error updating post:", updateError);
+          console.error('Error updating post:', updateError);
         }
       }
 
       setBlogContent(content);
     } catch (err) {
-      console.error("Error regenerating:", err);
+      console.error('Error regenerating:', err);
     } finally {
       setIsLoading(false);
       setProgress({
         stage: 'complete',
         progress: 100,
         message: '',
-        details: undefined
+        details: undefined,
       });
     }
   };
 
   const handleBackClick = () => {
-    navigate("/");
+    navigate('/');
   };
 
   // Parse PR URL to get owner/repo#number format
   const getPRDisplay = (prUrl: string | null) => {
     if (!prUrl) return null;
-    
+
     // Extract owner, repo, and PR number from GitHub PR URL
     const match = prUrl.match(/github\.com\/([^/]+)\/([^/]+)\/pull\/(\d+)/);
     if (match) {
@@ -241,49 +251,55 @@ export default function Edit({ user }: { user: any }) {
   };
 
   // Auto-save functionality
-  const saveContent = useCallback(async (content: string) => {
-    if (!user || !postId) return;
-    
-    setSaveStatus('saving');
-    
-    try {
-      const { error } = await supabase
-        .from("cached_posts")
-        .update({ 
-          content,
-          is_draft: true,
-          updated_at: new Date().toISOString()
-        })
-        .eq("id", postId);
+  const saveContent = useCallback(
+    async (content: string) => {
+      if (!user || !postId) return;
 
-      if (error) {
-        console.error("Error saving draft:", error);
+      setSaveStatus('saving');
+
+      try {
+        const { error } = await supabase
+          .from('cached_posts')
+          .update({
+            content,
+            is_draft: true,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', postId);
+
+        if (error) {
+          console.error('Error saving draft:', error);
+          setSaveStatus('error');
+        } else {
+          setSaveStatus('saved');
+          // Clear save status after 2 seconds
+          setTimeout(() => setSaveStatus(null), 2000);
+        }
+      } catch (err) {
+        console.error('Error saving draft:', err);
         setSaveStatus('error');
-      } else {
-        setSaveStatus('saved');
-        // Clear save status after 2 seconds
-        setTimeout(() => setSaveStatus(null), 2000);
       }
-    } catch (err) {
-      console.error("Error saving draft:", err);
-      setSaveStatus('error');
-    }
-  }, [user, postId]);
+    },
+    [user, postId]
+  );
 
   // Handle content changes with debouncing
-  const handleContentChange = useCallback((newContent: string) => {
-    setBlogContent(newContent);
-    
-    // Clear existing timer
-    if (saveTimerRef.current) {
-      clearTimeout(saveTimerRef.current);
-    }
-    
-    // Set new timer for auto-save (1.5 seconds after user stops typing)
-    saveTimerRef.current = setTimeout(() => {
-      saveContent(newContent);
-    }, 1500);
-  }, [saveContent]);
+  const handleContentChange = useCallback(
+    (newContent: string) => {
+      setBlogContent(newContent);
+
+      // Clear existing timer
+      if (saveTimerRef.current) {
+        clearTimeout(saveTimerRef.current);
+      }
+
+      // Set new timer for auto-save (1.5 seconds after user stops typing)
+      saveTimerRef.current = setTimeout(() => {
+        saveContent(newContent);
+      }, 1500);
+    },
+    [saveContent]
+  );
 
   // Cleanup timer on unmount
   useEffect(() => {
@@ -319,7 +335,7 @@ export default function Edit({ user }: { user: any }) {
           <ArrowLeft className="h-4 w-4" />
           Back to Home
         </Button>
-        
+
         {currentPrUrl && (
           <a
             href={currentPrUrl}
@@ -327,7 +343,7 @@ export default function Edit({ user }: { user: any }) {
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
           >
-            {getPRDisplay(currentPrUrl) || "View PR"}
+            {getPRDisplay(currentPrUrl) || 'View PR'}
             <ExternalLink className="h-4 w-4" />
           </a>
         )}

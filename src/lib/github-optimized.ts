@@ -23,8 +23,10 @@ export async function fetchPRDataOptimized(
   prUrl: string,
   onProgress?: (progress: FetchProgress) => void
 ) {
-  const { data: { session } } = await supabase.auth.getSession();
-  
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
   // If user is authenticated, use their GitHub token directly
   if (session?.provider_token) {
     const octokit = new Octokit({ auth: session.provider_token });
@@ -34,7 +36,7 @@ export async function fetchPRDataOptimized(
     onProgress?.({
       stage: 'pr_details',
       progress: 10,
-      message: 'Fetching pull request data...'
+      message: 'Fetching pull request data...',
     });
 
     // Fetch all data in parallel for maximum speed
@@ -48,7 +50,7 @@ export async function fetchPRDataOptimized(
     onProgress?.({
       stage: 'files',
       progress: 60,
-      message: 'Processing pull request data...'
+      message: 'Processing pull request data...',
     });
 
     // Handle errors gracefully
@@ -79,7 +81,7 @@ export async function fetchPRDataOptimized(
     onProgress?.({
       stage: 'generating',
       progress: 80,
-      message: 'Preparing content generation...'
+      message: 'Preparing content generation...',
     });
 
     return {
@@ -99,15 +101,15 @@ export async function fetchPRDataOptimized(
         totalFiles: files.length,
         additions: files.reduce((sum, f) => sum + f.additions, 0),
         deletions: files.reduce((sum, f) => sum + f.deletions, 0),
-      }
+      },
     };
   }
-  
+
   // For unauthenticated users, use GitHub's public API (with rate limits)
   onProgress?.({
     stage: 'pr_details',
     progress: 20,
-    message: 'Fetching pull request data...'
+    message: 'Fetching pull request data...',
   });
 
   const octokit = new Octokit();
@@ -125,7 +127,7 @@ export async function fetchPRDataOptimized(
     onProgress?.({
       stage: 'files',
       progress: 60,
-      message: 'Processing pull request data...'
+      message: 'Processing pull request data...',
     });
 
     // Handle errors gracefully
@@ -156,7 +158,7 @@ export async function fetchPRDataOptimized(
     onProgress?.({
       stage: 'generating',
       progress: 80,
-      message: 'Preparing content generation...'
+      message: 'Preparing content generation...',
     });
 
     return {
@@ -176,7 +178,7 @@ export async function fetchPRDataOptimized(
         totalFiles: files.length,
         additions: files.reduce((sum, f) => sum + f.additions, 0),
         deletions: files.reduce((sum, f) => sum + f.deletions, 0),
-      }
+      },
     };
   } catch (error) {
     console.error('Error fetching PR data:', error);

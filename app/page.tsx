@@ -1,6 +1,6 @@
-import { GithubIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { GithubIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 
 export default function Home() {
   return (
@@ -13,12 +13,15 @@ export default function Home() {
           </div>
         </div>
       </nav>
-      
+
       <div className="max-w-7xl mx-auto py-10 px-4">
         <Card className="p-6">
-          <h2 className="text-2xl font-semibold mb-6">Transform Your Pull Request into a Blog Post</h2>
+          <h2 className="text-2xl font-semibold mb-6">
+            Transform Your Pull Request into a Blog Post
+          </h2>
           <p className="text-gray-600 mb-6">
-            Turn your code commits into engaging developer-friendly blog posts. Simply paste your pull request URL below to get started.
+            Turn your code commits into engaging developer-friendly blog posts. Simply paste your
+            pull request URL below to get started.
           </p>
           <form className="space-y-4">
             <div>

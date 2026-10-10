@@ -1,5 +1,5 @@
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { OpenAI } from "https://deno.land/x/openai@v4.24.0/mod.ts";
+import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
+import { OpenAI } from 'https://deno.land/x/openai@v4.24.0/mod.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -18,10 +18,10 @@ Deno.serve(async (req) => {
     // Validate required fields
     if (!systemPrompt || !userPrompt) {
       return new Response(
-        JSON.stringify({ error: "Both systemPrompt and userPrompt are required" }),
-        { 
+        JSON.stringify({ error: 'Both systemPrompt and userPrompt are required' }),
+        {
           status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         }
       );
     }
@@ -29,13 +29,10 @@ Deno.serve(async (req) => {
     // Get OpenAI API key from environment
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
     if (!openAIApiKey) {
-      return new Response(
-        JSON.stringify({ error: "OpenAI API key not configured" }),
-        { 
-          status: 500,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
+      return new Response(JSON.stringify({ error: 'OpenAI API key not configured' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     // Initialize OpenAI client
@@ -46,33 +43,30 @@ Deno.serve(async (req) => {
     // Generate content
     const completion = await openai.chat.completions.create({
       messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt }
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
       ],
-      model: "gpt-4o",
+      model: 'gpt-4o',
       temperature,
       max_tokens: 2000,
     });
 
     const content = completion.choices[0].message.content || '';
 
-    return new Response(
-      JSON.stringify({ content }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200 
-      }
-    );
+    return new Response(JSON.stringify({ content }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 200,
+    });
   } catch (error) {
-    console.error("Error generating content:", error);
+    console.error('Error generating content:', error);
     return new Response(
-      JSON.stringify({ 
-        error: "Failed to generate content",
-        details: error instanceof Error ? error.message : "Unknown error"
+      JSON.stringify({
+        error: 'Failed to generate content',
+        details: error instanceof Error ? error.message : 'Unknown error',
       }),
-      { 
+      {
         status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );
   }

@@ -1,5 +1,13 @@
-import { Loader2, GitPullRequest, FileCode, Sparkles, CheckCircle, MessageSquare, FileText } from "lucide-react";
-import { FetchProgress } from "../lib/github-optimized";
+import {
+  Loader2,
+  GitPullRequest,
+  FileCode,
+  Sparkles,
+  CheckCircle,
+  MessageSquare,
+  FileText,
+} from 'lucide-react';
+import { FetchProgress } from '../lib/github-optimized';
 
 export interface EnhancedFetchProgress extends FetchProgress {
   details?: {
@@ -24,7 +32,7 @@ export function EnhancedLoadingProgress({ progress }: EnhancedLoadingProgressPro
     if (progress.details?.currentFile) {
       return <FileText className="h-5 w-5" />;
     }
-    
+
     switch (progress.stage) {
       case 'pr_details':
         return <GitPullRequest className="h-5 w-5" />;
@@ -45,19 +53,19 @@ export function EnhancedLoadingProgress({ progress }: EnhancedLoadingProgressPro
     if (progress.details?.isAnalyzingComments) {
       return 'Looking at comments...';
     }
-    
+
     if (progress.details?.currentFile) {
       return `Looking at file: ${progress.details.currentFile}`;
     }
-    
+
     if (progress.details?.currentCommit && progress.details?.commitCount) {
       return `Analyzing commit ${progress.details.currentCommit} of ${progress.details.commitCount}`;
     }
-    
+
     if (progress.details?.currentFileIndex && progress.details?.totalFiles) {
       return `Processing file ${progress.details.currentFileIndex} of ${progress.details.totalFiles}`;
     }
-    
+
     return progress.message;
   };
 
@@ -84,23 +92,21 @@ export function EnhancedLoadingProgress({ progress }: EnhancedLoadingProgressPro
         <div className="space-y-4">
           {/* Header */}
           <div className="flex items-start space-x-3">
-            <div className={`${progress.stage === 'complete' ? 'text-green-600' : 'text-[#0969da]'}`}>
+            <div
+              className={`${progress.stage === 'complete' ? 'text-green-600' : 'text-[#0969da]'}`}
+            >
               {getIcon()}
             </div>
             <div className="flex-1">
-              <h3 className="text-base font-semibold text-[#24292f]">
-                {getStageText()}
-              </h3>
-              <p className="text-sm text-[#57606a] mt-1">
-                {getDetailedMessage()}
-              </p>
+              <h3 className="text-base font-semibold text-[#24292f]">{getStageText()}</h3>
+              <p className="text-sm text-[#57606a] mt-1">{getDetailedMessage()}</p>
             </div>
             <span className="text-sm text-[#57606a]">{progress.progress}%</span>
           </div>
 
           {/* Progress bar */}
           <div className="w-full bg-[#eaeef2] rounded-full h-2 overflow-hidden">
-            <div 
+            <div
               className="h-full bg-[#2da44e] transition-all duration-300 ease-out"
               style={{ width: `${progress.progress}%` }}
             />
@@ -109,33 +115,42 @@ export function EnhancedLoadingProgress({ progress }: EnhancedLoadingProgressPro
           {/* Stage indicators */}
           <div className="flex items-center justify-between text-sm">
             {['Fetching PR data', 'Analyzing changes', 'Generating content'].map((stage, index) => {
-              const isActive = 
+              const isActive =
                 (progress.stage === 'pr_details' && index === 0) ||
                 ((progress.stage === 'commits' || progress.stage === 'files') && index === 1) ||
                 (progress.stage === 'generating' && index === 2);
-              
-              const isComplete = 
-                ((progress.stage === 'commits' || progress.stage === 'files' || progress.stage === 'generating' || progress.stage === 'complete') && index === 0) ||
-                ((progress.stage === 'generating' || progress.stage === 'complete') && index === 1) ||
+
+              const isComplete =
+                ((progress.stage === 'commits' ||
+                  progress.stage === 'files' ||
+                  progress.stage === 'generating' ||
+                  progress.stage === 'complete') &&
+                  index === 0) ||
+                ((progress.stage === 'generating' || progress.stage === 'complete') &&
+                  index === 1) ||
                 (progress.stage === 'complete' && index === 2);
 
               return (
                 <div key={stage} className="flex items-center space-x-2">
-                  <div className={`
+                  <div
+                    className={`
                     w-5 h-5 rounded-full flex items-center justify-center
-                    ${isComplete ? 'bg-[#2da44e]' : 
-                      isActive ? 'bg-[#0969da]' : 
-                      'bg-[#eaeef2]'}
-                  `}>
-                    {isComplete && (
-                      <CheckCircle className="h-3 w-3 text-white" />
-                    )}
+                    ${isComplete ? 'bg-[#2da44e]' : isActive ? 'bg-[#0969da]' : 'bg-[#eaeef2]'}
+                  `}
+                  >
+                    {isComplete && <CheckCircle className="h-3 w-3 text-white" />}
                   </div>
-                  <span className={`
-                    ${isComplete ? 'text-[#24292f]' : 
-                      isActive ? 'text-[#24292f] font-medium' : 
-                      'text-[#57606a]'}
-                  `}>
+                  <span
+                    className={`
+                    ${
+                      isComplete
+                        ? 'text-[#24292f]'
+                        : isActive
+                          ? 'text-[#24292f] font-medium'
+                          : 'text-[#57606a]'
+                    }
+                  `}
+                  >
                     {stage}
                   </span>
                 </div>

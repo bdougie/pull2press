@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
-import Edit from "../pages/Edit";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
+import Edit from '../pages/Edit';
 
 // Set up mocks at the top level
 const navigateMock = vi.fn();
@@ -13,8 +13,8 @@ const paramsMock = {
 };
 
 // Mock the react-router-dom hooks
-vi.mock("react-router-dom", async () => {
-  const actual = await vi.importActual("react-router-dom");
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
   return {
     ...actual,
     useNavigate: () => navigateMock,
@@ -25,28 +25,28 @@ vi.mock("react-router-dom", async () => {
 
 // Mock database response for fetching post by ID
 const mockPostData = {
-  id: "test-post-id",
-  content: "Test post content from database",
-  pr_url: "https://github.com/user/repo/pull/123",
-  title: "Test Post Title",
-  created_at: "2023-01-01T00:00:00Z",
-  user_id: "test-user-id",
+  id: 'test-post-id',
+  content: 'Test post content from database',
+  pr_url: 'https://github.com/user/repo/pull/123',
+  title: 'Test Post Title',
+  created_at: '2023-01-01T00:00:00Z',
+  user_id: 'test-user-id',
 };
 
 // Mock the supabase client
-vi.mock("../lib/supabase", () => {
+vi.mock('../lib/supabase', () => {
   return {
     supabase: {
       from: () => ({
         select: () => ({
           eq: (_field: string, value: string) => ({
             single: () => {
-              if (value === "test-post-id") {
+              if (value === 'test-post-id') {
                 return Promise.resolve({ data: mockPostData, error: null });
-              } else if (value === "error-id") {
+              } else if (value === 'error-id') {
                 return Promise.resolve({
                   data: null,
-                  error: { message: "Database error" },
+                  error: { message: 'Database error' },
                 });
               } else {
                 return Promise.resolve({ data: null, error: null });
@@ -81,18 +81,16 @@ vi.mock("../lib/supabase", () => {
 });
 
 // Mock OpenAI and GitHub functions
-vi.mock("../lib/openai", () => ({
-  generateBlogPost: vi.fn().mockResolvedValue("Test blog content"),
+vi.mock('../lib/openai', () => ({
+  generateBlogPost: vi.fn().mockResolvedValue('Test blog content'),
 }));
 
-vi.mock("../lib/github", () => ({
-  fetchPRData: vi
-    .fn()
-    .mockResolvedValue({ title: "Test PR", description: "Test description" }),
+vi.mock('../lib/github', () => ({
+  fetchPRData: vi.fn().mockResolvedValue({ title: 'Test PR', description: 'Test description' }),
 }));
 
 // Mock the markdown editor component
-vi.mock("../components/markdown-editor", () => ({
+vi.mock('../components/markdown-editor', () => ({
   default: ({
     initialContent,
     onRegenerate,
@@ -115,7 +113,7 @@ vi.mock("../components/markdown-editor", () => ({
   ),
 }));
 
-describe("Edit Component Flow", () => {
+describe('Edit Component Flow', () => {
   // Setup for individual tests
   beforeEach(() => {
     vi.clearAllMocks();
@@ -123,85 +121,85 @@ describe("Edit Component Flow", () => {
     paramsMock.id = null;
   });
 
-  it("redirects to home if no content is provided via state and no ID in URL", async () => {
+  it('redirects to home if no content is provided via state and no ID in URL', async () => {
     locationStateMock.state = null;
     paramsMock.id = null;
 
     render(
-      <MemoryRouter initialEntries={["/edit"]}>
+      <MemoryRouter initialEntries={['/edit']}>
         <Edit user={null} />
       </MemoryRouter>
     );
 
     // Verify that navigate was called with "/"
     await waitFor(() => {
-      expect(navigateMock).toHaveBeenCalledWith("/");
+      expect(navigateMock).toHaveBeenCalledWith('/');
     });
   });
 
   // Skipping due to component mocking issues - the actual functionality works
-  it.skip("displays the markdown editor with content from location state", async () => {
+  it.skip('displays the markdown editor with content from location state', async () => {
     locationStateMock.state = {
-      content: "Test blog content from state",
-      prUrl: "https://github.com/user/repo/pull/123",
+      content: 'Test blog content from state',
+      prUrl: 'https://github.com/user/repo/pull/123',
     };
     paramsMock.id = null;
 
     render(
-      <MemoryRouter initialEntries={["/edit"]}>
+      <MemoryRouter initialEntries={['/edit']}>
         <Edit user={null} />
       </MemoryRouter>
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId("markdown-editor")).toBeInTheDocument();
+      expect(screen.getByTestId('markdown-editor')).toBeInTheDocument();
     });
 
-    expect(screen.getByTestId("markdown-content")).toHaveTextContent(
-      "Test blog content from state"
+    expect(screen.getByTestId('markdown-content')).toHaveTextContent(
+      'Test blog content from state'
     );
   });
 
-  it("navigates back to home when back button is clicked", async () => {
+  it('navigates back to home when back button is clicked', async () => {
     locationStateMock.state = {
-      content: "Test blog content",
-      prUrl: "https://github.com/user/repo/pull/123",
+      content: 'Test blog content',
+      prUrl: 'https://github.com/user/repo/pull/123',
     };
 
     render(
-      <MemoryRouter initialEntries={["/edit"]}>
+      <MemoryRouter initialEntries={['/edit']}>
         <Edit user={null} />
       </MemoryRouter>
     );
 
     await waitFor(() => {
-      expect(screen.getByText("Back to Home")).toBeInTheDocument();
+      expect(screen.getByText('Back to Home')).toBeInTheDocument();
     });
 
-    const backButton = screen.getByText("Back to Home");
+    const backButton = screen.getByText('Back to Home');
     fireEvent.click(backButton);
 
-    expect(navigateMock).toHaveBeenCalledWith("/");
+    expect(navigateMock).toHaveBeenCalledWith('/');
   });
 
   // We're skipping this test for now as it requires a more complex setup
-  it.skip("regenerates content when regenerate button is clicked", async () => {
+  it.skip('regenerates content when regenerate button is clicked', async () => {
     locationStateMock.state = {
-      content: "Initial content",
-      prUrl: "https://github.com/user/repo/pull/123",
+      content: 'Initial content',
+      prUrl: 'https://github.com/user/repo/pull/123',
     };
 
     render(
-      <MemoryRouter initialEntries={["/edit"]}>
+      <MemoryRouter initialEntries={['/edit']}>
         <Edit user={null} />
       </MemoryRouter>
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId("regenerate-button")).toBeInTheDocument();
+      expect(screen.getByTestId('regenerate-button')).toBeInTheDocument();
     });
 
-    const regenerateButton = screen.getByTestId("regenerate-button");
+    const regenerateButton = screen.getByTestId('regenerate-button');
     fireEvent.click(regenerateButton);
 
     // Since we've mocked the regenerate functionality, we're just testing that
@@ -211,52 +209,52 @@ describe("Edit Component Flow", () => {
 
   // New tests for the ID-based post loading functionality
   // Skipping due to component mocking issues - the actual functionality works
-  it.skip("fetches post data when an ID is provided in the URL", async () => {
-    paramsMock.id = "test-post-id";
+  it.skip('fetches post data when an ID is provided in the URL', async () => {
+    paramsMock.id = 'test-post-id';
 
     render(
-      <MemoryRouter initialEntries={["/edit/test-post-id"]}>
+      <MemoryRouter initialEntries={['/edit/test-post-id']}>
         <Edit user={null} />
       </MemoryRouter>
     );
 
     // Since loading is asynchronous, we need to wait for the content to appear
     await waitFor(() => {
-      expect(screen.getByTestId("markdown-editor")).toBeInTheDocument();
+      expect(screen.getByTestId('markdown-editor')).toBeInTheDocument();
     });
 
-    expect(screen.getByTestId("markdown-content")).toHaveTextContent(
-      "Test post content from database"
+    expect(screen.getByTestId('markdown-content')).toHaveTextContent(
+      'Test post content from database'
     );
   });
 
-  it("redirects to home if the post with the specified ID is not found", async () => {
-    paramsMock.id = "non-existent-id";
+  it('redirects to home if the post with the specified ID is not found', async () => {
+    paramsMock.id = 'non-existent-id';
 
     render(
-      <MemoryRouter initialEntries={["/edit/non-existent-id"]}>
+      <MemoryRouter initialEntries={['/edit/non-existent-id']}>
         <Edit user={null} />
       </MemoryRouter>
     );
 
     // Wait for the navigation to occur after data fetching
     await waitFor(() => {
-      expect(navigateMock).toHaveBeenCalledWith("/");
+      expect(navigateMock).toHaveBeenCalledWith('/');
     });
   });
 
   it("redirects to home if there's an error fetching the post", async () => {
-    paramsMock.id = "error-id";
+    paramsMock.id = 'error-id';
 
     render(
-      <MemoryRouter initialEntries={["/edit/error-id"]}>
+      <MemoryRouter initialEntries={['/edit/error-id']}>
         <Edit user={null} />
       </MemoryRouter>
     );
 
     // Wait for the navigation to occur after error
     await waitFor(() => {
-      expect(navigateMock).toHaveBeenCalledWith("/");
+      expect(navigateMock).toHaveBeenCalledWith('/');
     });
   });
 });

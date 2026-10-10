@@ -5,6 +5,7 @@ env.allowLocalModels = false;
 env.useBrowserCache = false;
 
 // Cache the pipeline to avoid recreating it
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let embeddingPipeline: any = null;
 
 /**
@@ -29,13 +30,13 @@ async function getEmbeddingPipeline() {
  */
 export async function generateEmbedding(text: string): Promise<number[]> {
   const extractor = await getEmbeddingPipeline();
-  
+
   // Generate embeddings
   const output = await extractor(text, {
     pooling: 'mean',
-    normalize: true
+    normalize: true,
   });
-  
+
   // Convert to regular array
   return Array.from(output.data);
 }
@@ -47,28 +48,30 @@ export async function generateEmbedding(text: string): Promise<number[]> {
  */
 export async function generateEmbeddings(texts: string[]): Promise<number[][]> {
   const extractor = await getEmbeddingPipeline();
-  
+
   // Process in batches for efficiency
   const batchSize = 32;
   const embeddings: number[][] = [];
-  
+
   for (let i = 0; i < texts.length; i += batchSize) {
     const batch = texts.slice(i, i + batchSize);
-    
+
     // Generate embeddings for batch
     const outputs = await Promise.all(
-      batch.map(text => extractor(text, {
-        pooling: 'mean',
-        normalize: true
-      }))
+      batch.map((text) =>
+        extractor(text, {
+          pooling: 'mean',
+          normalize: true,
+        })
+      )
     );
-    
+
     // Convert to arrays
-    outputs.forEach(output => {
+    outputs.forEach((output) => {
       embeddings.push(Array.from(output.data));
     });
   }
-  
+
   return embeddings;
 }
 
@@ -82,17 +85,17 @@ export function cosineSimilarity(a: number[], b: number[]): number {
   if (a.length !== b.length) {
     throw new Error('Embeddings must have the same length');
   }
-  
+
   let dotProduct = 0;
   let normA = 0;
   let normB = 0;
-  
+
   for (let i = 0; i < a.length; i++) {
     dotProduct += a[i] * b[i];
     normA += a[i] * a[i];
     normB += b[i] * b[i];
   }
-  
+
   return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
 }
 
@@ -110,21 +113,19 @@ export async function findSimilar(
 ): Promise<Array<{ index: number; score: number; text: string }>> {
   // Generate query embedding
   const queryEmbedding = await generateEmbedding(query);
-  
+
   // Generate embeddings for all texts
   const textEmbeddings = await generateEmbeddings(texts);
-  
+
   // Calculate similarities
   const similarities = textEmbeddings.map((embedding, index) => ({
     index,
     score: cosineSimilarity(queryEmbedding, embedding),
-    text: texts[index]
+    text: texts[index],
   }));
-  
+
   // Sort by similarity and return top K
-  return similarities
-    .sort((a, b) => b.score - a.score)
-    .slice(0, topK);
+  return similarities.sort((a, b) => b.score - a.score).slice(0, topK);
 }
 
 /**
@@ -136,11 +137,11 @@ export async function findSimilar(
 export function prepareTextForEmbedding(text: string, maxLength: number = 2000): string {
   // Clean whitespace
   let cleaned = text.trim().replace(/\s+/g, ' ');
-  
+
   // Truncate if needed
   if (cleaned.length > maxLength) {
     cleaned = cleaned.substring(0, maxLength) + '...';
   }
-  
+
   return cleaned;
 }

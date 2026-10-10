@@ -1,7 +1,6 @@
 import { Octokit } from 'octokit';
 import { supabase } from './supabase';
 
-
 export function extractPRInfo(url: string) {
   const match = url.match(/github\.com\/([^/]+)\/([^/]+)\/pull\/(\d+)/);
   if (!match) {
@@ -15,8 +14,10 @@ export function extractPRInfo(url: string) {
 }
 
 export async function fetchPRData(prUrl: string) {
-  const { data: { session } } = await supabase.auth.getSession();
-  
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
   // If user is authenticated, use their GitHub token directly
   if (session?.provider_token) {
     const octokit = new Octokit({ auth: session.provider_token });
@@ -67,7 +68,7 @@ export async function fetchPRData(prUrl: string) {
       updated_at: pr.updated_at,
     };
   }
-  
+
   // For unauthenticated users, use GitHub's public API (with rate limits)
   const octokit = new Octokit();
   const { owner, repo, pull_number } = extractPRInfo(prUrl);

@@ -29,16 +29,25 @@ const EXAMPLE_PROMPTS: ExamplePrompt[] = [
   { icon: '✅', label: 'Fix grammar', prompt: 'Fix spelling and grammar errors' },
   { icon: '📢', label: 'Add CTA', prompt: 'Add a compelling call-to-action' },
   { icon: '💻', label: 'Add code example', prompt: 'Add a relevant code example' },
-  { icon: '🎯', label: 'Make concise', prompt: 'Make this more concise while keeping the key points' },
-  { icon: '🔗', label: 'Add GitHub links', prompt: 'Add GitHub links to relevant files mentioned in this text. Use semantic search to find the actual file paths on the default branch and create direct links. If specific files cannot be found, include a link to the PR as fallback. Integrate the links naturally into the text or as a call-to-action.' },
+  {
+    icon: '🎯',
+    label: 'Make concise',
+    prompt: 'Make this more concise while keeping the key points',
+  },
+  {
+    icon: '🔗',
+    label: 'Add GitHub links',
+    prompt:
+      'Add GitHub links to relevant files mentioned in this text. Use semantic search to find the actual file paths on the default branch and create direct links. If specific files cannot be found, include a link to the PR as fallback. Integrate the links naturally into the text or as a call-to-action.',
+  },
   { icon: '🔍', label: 'Find helpful links', prompt: '__FIND_HELPFUL_LINKS__', isSpecial: true },
 ];
 
-export function PromptEditorPopup({ 
-  selectedText, 
-  position, 
-  onClose, 
-  onApply 
+export function PromptEditorPopup({
+  selectedText,
+  position,
+  onClose,
+  onApply,
 }: PromptEditorPopupProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -76,26 +85,25 @@ export function PromptEditorPopup({
 
     try {
       const response = await findHelpfulLinks(selectedText, { maxLinks: 5 });
-      
+
       if (response.links && response.links.length > 0) {
-        
         // Format the links as markdown
         const linksMarkdown = formatLinksAsMarkdown(response.links);
-        
+
         // Create a message with the found links
         const assistantMessage: Message = {
           role: 'assistant',
-          content: `I found ${response.links.length} helpful resources for your content:\n${linksMarkdown}\n\nYou can apply these links to add them to your content, or I can help you integrate them more naturally into the text.`
+          content: `I found ${response.links.length} helpful resources for your content:\n${linksMarkdown}\n\nYou can apply these links to add them to your content, or I can help you integrate them more naturally into the text.`,
         };
-        
-        setMessages(prev => [...prev, assistantMessage]);
-        
+
+        setMessages((prev) => [...prev, assistantMessage]);
+
         // Add to context
-        contextRef.current.addMessage({ 
-          role: 'assistant', 
-          content: assistantMessage.content 
+        contextRef.current.addMessage({
+          role: 'assistant',
+          content: assistantMessage.content,
         });
-        
+
         // Update token count
         setTokenCount(contextRef.current.getTotalTokens());
       } else {
@@ -113,7 +121,7 @@ export function PromptEditorPopup({
     if (!message.trim() || isStreaming) return;
 
     const userMessage: Message = { role: 'user', content: message };
-    setMessages(prev => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setIsStreaming(true);
     setStreamingContent('');
@@ -124,30 +132,26 @@ export function PromptEditorPopup({
 
     try {
       let fullResponse = '';
-      
+
       // Stream the response
-      const stream = streamPromptResponse(
-        selectedText,
-        message,
-        contextRef.current.getMessages()
-      );
+      const stream = streamPromptResponse(selectedText, message, contextRef.current.getMessages());
 
       for await (const chunk of stream) {
         fullResponse += chunk;
         setStreamingContent(fullResponse);
       }
-      
-      const assistantMessage: Message = { 
-        role: 'assistant', 
-        content: fullResponse 
+
+      const assistantMessage: Message = {
+        role: 'assistant',
+        content: fullResponse,
       };
-      
+
       // Add to context
       contextRef.current.addMessage({ role: 'assistant', content: fullResponse });
-      
-      setMessages(prev => [...prev, assistantMessage]);
+
+      setMessages((prev) => [...prev, assistantMessage]);
       setStreamingContent('');
-      
+
       // Update token count
       setTokenCount(contextRef.current.getTotalTokens());
     } catch (error) {
@@ -183,29 +187,21 @@ export function PromptEditorPopup({
   return (
     <>
       {/* Backdrop */}
-      <div 
-        className="fixed inset-0 bg-black/20" 
-        onClick={onClose}
-        style={{ zIndex: 999 }}
-      />
-      
+      <div className="fixed inset-0 bg-black/20" onClick={onClose} style={{ zIndex: 999 }} />
+
       {/* Popup */}
-      <Card className="w-96 max-h-[500px] flex flex-col bg-white shadow-xl border border-[#d0d7de]" style={popupStyle}>
+      <Card
+        className="w-96 max-h-[500px] flex flex-col bg-white shadow-xl border border-[#d0d7de]"
+        style={popupStyle}
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-[#d0d7de]">
           <div className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-[#0969da]" />
             <h3 className="font-semibold text-[#24292f]">AI Editor</h3>
-            {tokenCount > 0 && (
-              <span className="text-xs text-[#57606a]">~{tokenCount} tokens</span>
-            )}
+            {tokenCount > 0 && <span className="text-xs text-[#57606a]">~{tokenCount} tokens</span>}
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            className="h-8 w-8"
-          >
+          <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8">
             <X className="h-4 w-4" />
           </Button>
         </div>
@@ -248,11 +244,13 @@ export function PromptEditorPopup({
 
           {messages.map((message, index) => (
             <div key={index} className={`space-y-1 ${message.role === 'user' ? 'text-right' : ''}`}>
-              <div className={`inline-block max-w-[80%] p-3 rounded-lg ${
-                message.role === 'user' 
-                  ? 'bg-[#0969da] text-white' 
-                  : 'bg-[#f6f8fa] text-[#24292f] border border-[#d0d7de]'
-              }`}>
+              <div
+                className={`inline-block max-w-[80%] p-3 rounded-lg ${
+                  message.role === 'user'
+                    ? 'bg-[#0969da] text-white'
+                    : 'bg-[#f6f8fa] text-[#24292f] border border-[#d0d7de]'
+                }`}
+              >
                 <p className="text-sm whitespace-pre-wrap">{message.content}</p>
               </div>
               {message.role === 'assistant' && (
@@ -280,8 +278,8 @@ export function PromptEditorPopup({
                     onClick={() => onApply(message.content)}
                     className="h-7 text-xs"
                     style={{ backgroundColor: '#2da44e', color: 'white' }}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2c974b'}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2da44e'}
+                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#2c974b')}
+                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#2da44e')}
                   >
                     Apply
                   </Button>
@@ -320,8 +318,8 @@ export function PromptEditorPopup({
               size="icon"
               className="h-auto"
               style={{ backgroundColor: '#2da44e', color: 'white' }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2c974b'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2da44e'}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#2c974b')}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#2da44e')}
             >
               <Send className="h-4 w-4" />
             </Button>

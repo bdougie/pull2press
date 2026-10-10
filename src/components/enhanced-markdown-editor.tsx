@@ -1,32 +1,43 @@
-import { useState, useRef, DragEvent } from "react";
-import { Button } from "./ui/button";
-import { Card } from "./ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import { Eye, Edit2, Copy, Check, ExternalLink, Sparkles, Upload, HelpCircle, Cloud, CloudOff } from "lucide-react";
-import ReactMarkdown from "react-markdown";
-import { AuthButton } from "./auth-button";
-import RegenerationDropdown from "./regeneration-dropdown";
-import { SimplePromptEditor } from "./prompt-editor/SimplePromptEditor";
-import { uploadImage, isImageFile } from "../lib/image-upload";
-import { useToast } from "../../hooks/use-toast";
+import { useState, useRef, DragEvent } from 'react';
+import { Button } from './ui/button';
+import { Card } from './ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import {
+  Eye,
+  Edit2,
+  Copy,
+  Check,
+  ExternalLink,
+  Sparkles,
+  Upload,
+  HelpCircle,
+  Cloud,
+  CloudOff,
+} from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import { AuthButton } from './auth-button';
+import RegenerationDropdown from './regeneration-dropdown';
+import { SimplePromptEditor } from './prompt-editor/SimplePromptEditor';
+import { uploadImage, isImageFile } from '../lib/image-upload';
+import { useToast } from '../../hooks/use-toast';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "../../components/ui/dialog";
+} from '../../components/ui/dialog';
 
 interface EnhancedMarkdownEditorProps {
   initialContent: string;
   onRegenerate?: (options?: {
-    preset?: any;
+    preset?: Record<string, unknown>;
     customPrompt?: string;
     useUserStyle?: boolean;
   }) => void;
   isRegenerating?: boolean;
   showSignInPrompt?: boolean;
-  user?: any;
+  user?: { id: string } | null;
   onChange?: (content: string) => void;
   saveStatus?: 'saved' | 'saving' | 'error' | null;
 }
@@ -60,7 +71,7 @@ export default function EnhancedMarkdownEditor({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error("Failed to copy text:", err);
+      console.error('Failed to copy text:', err);
     }
   };
 
@@ -83,7 +94,7 @@ export default function EnhancedMarkdownEditor({
         metaKey: true,
         ctrlKey: false,
         bubbles: true,
-        cancelable: true
+        cancelable: true,
       });
       textarea.dispatchEvent(event);
     }
@@ -98,23 +109,26 @@ export default function EnhancedMarkdownEditor({
 
   const wrapSelection = (before: string, after: string = before) => {
     if (!textareaRef.current) return;
-    
+
     const textarea = textareaRef.current;
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
     const selectedText = content.substring(start, end);
     const beforeContent = content.substring(0, start);
     const afterContent = content.substring(end);
-    
+
     const newContent = beforeContent + before + selectedText + after + afterContent;
     updateContent(newContent);
-    
+
     // Set cursor position
     setTimeout(() => {
       textarea.focus();
       if (selectedText) {
         // If text was selected, select the wrapped text
-        textarea.setSelectionRange(start + before.length, start + before.length + selectedText.length);
+        textarea.setSelectionRange(
+          start + before.length,
+          start + before.length + selectedText.length
+        );
       } else {
         // If no text selected, position cursor between the markers
         textarea.setSelectionRange(start + before.length, start + before.length);
@@ -124,16 +138,16 @@ export default function EnhancedMarkdownEditor({
 
   const insertTextAtCursor = (text: string) => {
     if (!textareaRef.current) return;
-    
+
     const textarea = textareaRef.current;
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
     const before = content.substring(0, start);
     const after = content.substring(end);
-    
+
     const newContent = before + text + after;
     updateContent(newContent);
-    
+
     // Reset cursor position after React re-renders
     setTimeout(() => {
       textarea.focus();
@@ -144,30 +158,30 @@ export default function EnhancedMarkdownEditor({
   const handleImageUpload = async (file: File) => {
     if (!isImageFile(file)) {
       toast({
-        title: "Invalid file type",
-        description: "Please upload an image file (JPEG, PNG, GIF, or WebP)",
-        variant: "destructive",
+        title: 'Invalid file type',
+        description: 'Please upload an image file (JPEG, PNG, GIF, or WebP)',
+        variant: 'destructive',
       });
       return;
     }
 
     setIsUploading(true);
-    
+
     try {
       const imageUrl = await uploadImage(file);
       const imageMarkdown = `![${file.name}](${imageUrl})`;
       insertTextAtCursor(imageMarkdown);
-      
+
       toast({
-        title: "Image uploaded",
-        description: "Image has been uploaded and inserted into your content",
+        title: 'Image uploaded',
+        description: 'Image has been uploaded and inserted into your content',
       });
     } catch (error) {
-      console.error("Image upload failed:", error);
+      console.error('Image upload failed:', error);
       toast({
-        title: "Upload failed",
-        description: error instanceof Error ? error.message : "Failed to upload image",
-        variant: "destructive",
+        title: 'Upload failed',
+        description: error instanceof Error ? error.message : 'Failed to upload image',
+        variant: 'destructive',
       });
     } finally {
       setIsUploading(false);
@@ -177,7 +191,7 @@ export default function EnhancedMarkdownEditor({
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     if (e.dataTransfer.types.includes('Files')) {
       setIsDragging(true);
     }
@@ -186,12 +200,12 @@ export default function EnhancedMarkdownEditor({
   const handleDragLeave = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     // Only set dragging to false if we're leaving the editor area entirely
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX;
     const y = e.clientY;
-    
+
     if (x < rect.left || x >= rect.right || y < rect.top || y >= rect.bottom) {
       setIsDragging(false);
     }
@@ -201,19 +215,19 @@ export default function EnhancedMarkdownEditor({
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
-    
+
     const files = Array.from(e.dataTransfer.files);
     const imageFiles = files.filter(isImageFile);
-    
+
     if (imageFiles.length === 0) {
       toast({
-        title: "No images found",
-        description: "Please drop image files only",
-        variant: "destructive",
+        title: 'No images found',
+        description: 'Please drop image files only',
+        variant: 'destructive',
       });
       return;
     }
-    
+
     // Upload all images
     for (const file of imageFiles) {
       await handleImageUpload(file);
@@ -222,7 +236,7 @@ export default function EnhancedMarkdownEditor({
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     const isMeta = e.metaKey || e.ctrlKey;
-    
+
     if (isMeta) {
       switch (e.key) {
         case 'b':
@@ -237,11 +251,11 @@ export default function EnhancedMarkdownEditor({
           e.preventDefault();
           const textarea = textareaRef.current;
           if (!textarea) return;
-          
+
           const start = textarea.selectionStart;
           const end = textarea.selectionEnd;
           const selectedText = content.substring(start, end);
-          
+
           if (selectedText) {
             // Wrap selected text in markdown link syntax
             const linkMarkdown = `[${selectedText}](url)`;
@@ -249,7 +263,7 @@ export default function EnhancedMarkdownEditor({
             const after = content.substring(end);
             const newContent = before + linkMarkdown + after;
             updateContent(newContent);
-            
+
             // Set cursor position inside the url placeholder
             setTimeout(() => {
               textarea.focus();
@@ -265,7 +279,7 @@ export default function EnhancedMarkdownEditor({
             const after = content.substring(start);
             const newContent = before + linkMarkdown + after;
             updateContent(newContent);
-            
+
             // Position cursor inside the square brackets
             setTimeout(() => {
               textarea.focus();
@@ -275,7 +289,7 @@ export default function EnhancedMarkdownEditor({
           break;
       }
     }
-    
+
     // Alt/Option key shortcuts
     if (e.altKey) {
       switch (e.key) {
@@ -289,8 +303,8 @@ export default function EnhancedMarkdownEditor({
 
   const handlePaste = async (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
     const items = Array.from(e.clipboardData.items);
-    const imageItem = items.find(item => item.type.startsWith('image/'));
-    
+    const imageItem = items.find((item) => item.type.startsWith('image/'));
+
     if (imageItem) {
       e.preventDefault();
       const file = imageItem.getAsFile();
@@ -339,7 +353,7 @@ export default function EnhancedMarkdownEditor({
                   )}
                 </div>
               )}
-              
+
               <Button
                 onClick={handleAIEditorClick}
                 variant="outline"
@@ -350,7 +364,7 @@ export default function EnhancedMarkdownEditor({
                 <Sparkles className="h-4 w-4" />
                 <span className="hidden sm:inline">AI Editor</span>
               </Button>
-              
+
               {onRegenerate && (
                 <RegenerationDropdown
                   onRegenerate={onRegenerate}
@@ -378,7 +392,7 @@ export default function EnhancedMarkdownEditor({
                 </div>
               </div>
             )}
-            
+
             {isUploading && (
               <div className="absolute top-4 right-4 z-20 bg-white border border-gray-200 rounded-md px-3 py-2 shadow-lg">
                 <div className="flex items-center gap-2">
@@ -387,7 +401,7 @@ export default function EnhancedMarkdownEditor({
                 </div>
               </div>
             )}
-            
+
             <SimplePromptEditor onTextReplace={handleTextReplace}>
               <textarea
                 ref={textareaRef}
@@ -399,7 +413,6 @@ export default function EnhancedMarkdownEditor({
                 placeholder="Write your blog post in Markdown... (Drag images here or press Cmd+K to create links)"
               />
             </SimplePromptEditor>
-            
           </div>
         </TabsContent>
 
@@ -412,9 +425,7 @@ export default function EnhancedMarkdownEditor({
         <div className="flex justify-between items-center border-t border-[#d0d7de] p-4">
           {showSignInPrompt && (
             <div className="flex items-center gap-2">
-              <p className="text-sm text-muted-foreground">
-                Sign in to save your changes
-              </p>
+              <p className="text-sm text-muted-foreground">Sign in to save your changes</p>
               <AuthButton />
             </div>
           )}
@@ -455,33 +466,31 @@ export default function EnhancedMarkdownEditor({
           </div>
         </div>
       </Tabs>
-      
+
       <Dialog open={showTips} onOpenChange={setShowTips}>
         <DialogContent className="sm:max-w-[500px] fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%]">
           <DialogHeader>
             <DialogTitle>Keyboard Shortcuts</DialogTitle>
-            <DialogDescription>
-              Quick markdown editing shortcuts for the editor
-            </DialogDescription>
+            <DialogDescription>Quick markdown editing shortcuts for the editor</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-[120px_1fr] gap-4 text-sm">
               <div className="font-mono bg-gray-100 px-3 py-1.5 rounded text-center">Cmd+B</div>
               <div className="py-1.5">Bold text</div>
-              
+
               <div className="font-mono bg-gray-100 px-3 py-1.5 rounded text-center">Cmd+I</div>
               <div className="py-1.5">Italic text</div>
-              
+
               <div className="font-mono bg-gray-100 px-3 py-1.5 rounded text-center">Cmd+K</div>
               <div className="py-1.5">Insert link</div>
-              
+
               <div className="font-mono bg-gray-100 px-3 py-1.5 rounded text-center">Alt+`</div>
               <div className="py-1.5">Inline code</div>
-              
+
               <div className="font-mono bg-gray-100 px-3 py-1.5 rounded text-center">Cmd+J</div>
               <div className="py-1.5">Open AI editor</div>
             </div>
-            
+
             <div className="mt-2 pt-4 border-t">
               <p className="text-sm font-medium mb-2">Other features:</p>
               <ul className="text-sm text-gray-600 space-y-1">

@@ -4,7 +4,7 @@ import { describe, it, expect } from 'vitest';
 describe('PR URL Parsing', () => {
   const getPRDisplay = (prUrl: string | null) => {
     if (!prUrl) return null;
-    
+
     // Extract owner, repo, and PR number from GitHub PR URL
     const match = prUrl.match(/github\.com\/([^/]+)\/([^/]+)\/pull\/(\d+)/);
     if (match) {

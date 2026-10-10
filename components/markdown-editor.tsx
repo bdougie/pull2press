@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Eye, Edit2 } from "lucide-react";
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Eye, Edit2 } from 'lucide-react';
 
 interface MarkdownEditorProps {
   initialContent: string;
@@ -40,16 +40,12 @@ export default function MarkdownEditor({ initialContent }: MarkdownEditorProps) 
 
         <TabsContent value="preview" className="markdown-preview p-4">
           {/* We'll add markdown rendering here later */}
-          <div className="prose max-w-none">
-            {content}
-          </div>
+          <div className="prose max-w-none">{content}</div>
         </TabsContent>
 
         <div className="flex justify-end gap-2 border-t border-[#d0d7de] p-4">
           <Button variant="outline">Save Draft</Button>
-          <Button className="bg-[#2da44e] hover:bg-[#2c974b] text-white">
-            Publish
-          </Button>
+          <Button className="bg-[#2da44e] hover:bg-[#2c974b] text-white">Publish</Button>
         </div>
       </Tabs>
     </Card>

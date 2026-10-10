@@ -1,17 +1,11 @@
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { History, ExternalLink, Edit as EditIcon } from "lucide-react";
-import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase";
-import type { CachedPost } from "@/lib/supabase";
-import { useNavigate } from "react-router-dom";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { History, ExternalLink, Edit as EditIcon } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
+import type { CachedPost } from '@/lib/supabase';
+import { useNavigate } from 'react-router-dom';
 
 interface HistoryDrawerProps {
   onSelectPost: (post: CachedPost) => void;
@@ -28,13 +22,13 @@ export function HistoryDrawer({ onSelectPost }: HistoryDrawerProps) {
       if (!session?.session?.user) return;
 
       const { data, error } = await supabase
-        .from("cached_posts")
-        .select("*")
-        .eq("user_id", session.session.user.id)
-        .order("created_at", { ascending: false });
+        .from('cached_posts')
+        .select('*')
+        .eq('user_id', session.session.user.id)
+        .order('created_at', { ascending: false });
 
       if (error) {
-        console.error("Error fetching posts:", error);
+        console.error('Error fetching posts:', error);
         return;
       }
 
@@ -46,13 +40,13 @@ export function HistoryDrawer({ onSelectPost }: HistoryDrawerProps) {
 
     // Subscribe to changes
     const channel = supabase
-      .channel("cached_posts_changes")
+      .channel('cached_posts_changes')
       .on(
-        "postgres_changes",
+        'postgres_changes',
         {
-          event: "*",
-          schema: "public",
-          table: "cached_posts",
+          event: '*',
+          schema: 'public',
+          table: 'cached_posts',
         },
         () => {
           fetchPosts();

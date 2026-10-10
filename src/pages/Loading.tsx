@@ -1,11 +1,14 @@
-import { useState, useEffect } from "react";
-import { EnhancedLoadingProgress, EnhancedFetchProgress } from "../components/enhanced-loading-progress";
+import { useState, useEffect } from 'react';
+import {
+  EnhancedLoadingProgress,
+  EnhancedFetchProgress,
+} from '../components/enhanced-loading-progress';
 
 export default function Loading() {
   const [progress, setProgress] = useState<EnhancedFetchProgress>({
     stage: 'pr_details',
     progress: 0,
-    message: 'Starting...'
+    message: 'Starting...',
   });
 
   // Simulate progress for demo
@@ -14,20 +17,20 @@ export default function Loading() {
       {
         stage: 'pr_details',
         progress: 5,
-        message: 'Connecting to GitHub...'
+        message: 'Connecting to GitHub...',
       },
       {
         stage: 'pr_details',
         progress: 15,
-        message: 'Fetching pull request details...'
+        message: 'Fetching pull request details...',
       },
       {
         stage: 'pr_details',
         progress: 20,
         message: 'Looking at comments...',
         details: {
-          isAnalyzingComments: true
-        }
+          isAnalyzingComments: true,
+        },
       },
       {
         stage: 'commits',
@@ -35,8 +38,8 @@ export default function Loading() {
         message: 'Analyzing commits...',
         details: {
           currentCommit: 1,
-          commitCount: 5
-        }
+          commitCount: 5,
+        },
       },
       {
         stage: 'commits',
@@ -44,8 +47,8 @@ export default function Loading() {
         message: 'Analyzing commits...',
         details: {
           currentCommit: 3,
-          commitCount: 5
-        }
+          commitCount: 5,
+        },
       },
       {
         stage: 'files',
@@ -54,8 +57,8 @@ export default function Loading() {
         details: {
           currentFile: 'src/components/Button.tsx',
           totalFiles: 8,
-          currentFileIndex: 1
-        }
+          currentFileIndex: 1,
+        },
       },
       {
         stage: 'files',
@@ -64,8 +67,8 @@ export default function Loading() {
         details: {
           currentFile: 'src/lib/utils.ts',
           totalFiles: 8,
-          currentFileIndex: 4
-        }
+          currentFileIndex: 4,
+        },
       },
       {
         stage: 'files',
@@ -74,24 +77,24 @@ export default function Loading() {
         details: {
           currentFile: 'src/pages/Home.tsx',
           totalFiles: 8,
-          currentFileIndex: 7
-        }
+          currentFileIndex: 7,
+        },
       },
       {
         stage: 'generating',
         progress: 85,
-        message: 'Creating your blog post with AI...'
+        message: 'Creating your blog post with AI...',
       },
       {
         stage: 'generating',
         progress: 95,
-        message: 'Finalizing content...'
+        message: 'Finalizing content...',
       },
       {
         stage: 'complete',
         progress: 100,
-        message: 'Success! Your blog post is ready.'
-      }
+        message: 'Success! Your blog post is ready.',
+      },
     ];
 
     let index = 0;

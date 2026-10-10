@@ -1,23 +1,23 @@
-import { useState } from "react";
-import { Button } from "./ui/button";
-import { Card } from "./ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import { Eye, Edit2, Copy, Check, ExternalLink, Sparkles } from "lucide-react";
-import ReactMarkdown from "react-markdown";
-import { AuthButton } from "./auth-button";
-import RegenerationDropdown from "./regeneration-dropdown";
-import { SimplePromptEditor } from "./prompt-editor/SimplePromptEditor";
+import { useState } from 'react';
+import { Button } from './ui/button';
+import { Card } from './ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { Eye, Edit2, Copy, Check, ExternalLink, Sparkles } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import { AuthButton } from './auth-button';
+import RegenerationDropdown from './regeneration-dropdown';
+import { SimplePromptEditor } from './prompt-editor/SimplePromptEditor';
 
 interface MarkdownEditorProps {
   initialContent: string;
   onRegenerate?: (options?: {
-    preset?: any;
+    preset?: Record<string, unknown>;
     customPrompt?: string;
     useUserStyle?: boolean;
   }) => void;
   isRegenerating?: boolean;
   showSignInPrompt?: boolean;
-  user?: any;
+  user?: { id: string } | null;
 }
 
 export default function MarkdownEditor({
@@ -36,7 +36,7 @@ export default function MarkdownEditor({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error("Failed to copy text:", err);
+      console.error('Failed to copy text:', err);
     }
   };
 
@@ -60,7 +60,7 @@ export default function MarkdownEditor({
         metaKey: true,
         ctrlKey: false,
         bubbles: true,
-        cancelable: true
+        cancelable: true,
       });
       textarea.dispatchEvent(event);
     }
@@ -100,7 +100,7 @@ export default function MarkdownEditor({
                 <Sparkles className="h-4 w-4" />
                 AI Editor
               </Button>
-              
+
               {onRegenerate && (
                 <RegenerationDropdown
                   onRegenerate={onRegenerate}
@@ -132,18 +132,12 @@ export default function MarkdownEditor({
         <div className="flex justify-between items-center border-t border-[#d0d7de] p-4">
           {showSignInPrompt && (
             <div className="flex items-center gap-2">
-              <p className="text-sm text-muted-foreground">
-                Sign in to save your changes
-              </p>
+              <p className="text-sm text-muted-foreground">Sign in to save your changes</p>
               <AuthButton />
             </div>
           )}
           <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={handleCopy}
-              className="flex items-center gap-2"
-            >
+            <Button variant="outline" onClick={handleCopy} className="flex items-center gap-2">
               {copied ? (
                 <>
                   <Check className="h-4 w-4" />

@@ -5,14 +5,24 @@ import { SimplePromptEditor } from './SimplePromptEditor';
 
 // Mock the PromptEditorSidebar
 vi.mock('./PromptEditorSidebar', () => ({
-  PromptEditorSidebar: ({ isOpen, onClose, onApply, selectedText }: any) => 
+  PromptEditorSidebar: ({
+    isOpen,
+    onClose,
+    onApply,
+    selectedText,
+  }: {
+    isOpen: boolean;
+    onClose: () => void;
+    onApply: (text: string) => void;
+    selectedText: string;
+  }) =>
     isOpen ? (
       <div data-testid="prompt-sidebar">
         <div>Selected: {selectedText}</div>
         <button onClick={onClose}>Close</button>
         <button onClick={() => onApply('replaced text')}>Apply</button>
       </div>
-    ) : null
+    ) : null,
 }));
 
 describe('SimplePromptEditor', () => {
@@ -31,20 +41,20 @@ describe('SimplePromptEditor', () => {
       );
 
       const container = screen.getByText(/Hello world/).closest('.prompt-editor-container');
-      
+
       // Mock selection
       const mockSelection = {
         toString: () => 'world',
-        removeAllRanges: vi.fn()
+        removeAllRanges: vi.fn(),
       };
-      vi.spyOn(window, 'getSelection').mockReturnValue(mockSelection as any);
-      
+      vi.spyOn(window, 'getSelection').mockReturnValue(mockSelection as unknown as Selection);
+
       // Simulate Cmd+J
       fireEvent.keyDown(container!, {
         key: 'j',
-        metaKey: true
+        metaKey: true,
       });
-      
+
       // Should open sidebar with selected text
       await waitFor(() => {
         expect(screen.getByTestId('prompt-sidebar')).toBeInTheDocument();
@@ -61,24 +71,24 @@ describe('SimplePromptEditor', () => {
 
       const container = screen.getByText(/Hello world/).closest('.prompt-editor-container');
       const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
-      
+
       // Focus textarea with no selection
       textarea.focus();
       textarea.setSelectionRange(0, 0);
-      
+
       // Mock empty selection that will trigger select all
       const mockSelection = {
         toString: () => '',
-        removeAllRanges: vi.fn()
+        removeAllRanges: vi.fn(),
       };
-      vi.spyOn(window, 'getSelection').mockReturnValue(mockSelection as any);
-      
+      vi.spyOn(window, 'getSelection').mockReturnValue(mockSelection as unknown as Selection);
+
       // Press Cmd+J
       fireEvent.keyDown(container!, {
         key: 'j',
-        metaKey: true
+        metaKey: true,
       });
-      
+
       // Should select all text and open sidebar
       await waitFor(() => {
         expect(screen.getByTestId('prompt-sidebar')).toBeInTheDocument();
@@ -87,7 +97,6 @@ describe('SimplePromptEditor', () => {
     });
 
     it('should work with ctrl+j on Windows/Linux', async () => {
-      
       render(
         <SimplePromptEditor onTextReplace={mockOnTextReplace}>
           <textarea defaultValue="Test content" />
@@ -96,24 +105,24 @@ describe('SimplePromptEditor', () => {
 
       const container = screen.getByText(/Test content/).closest('.prompt-editor-container');
       const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
-      
+
       // Simulate text selection
       textarea.focus();
       textarea.setSelectionRange(0, 4); // Select "Test"
-      
+
       // Mock getSelection to return our selected text
       const mockSelection = {
         toString: () => 'Test',
-        removeAllRanges: vi.fn()
+        removeAllRanges: vi.fn(),
       };
-      vi.spyOn(window, 'getSelection').mockReturnValue(mockSelection as any);
-      
+      vi.spyOn(window, 'getSelection').mockReturnValue(mockSelection as unknown as Selection);
+
       // Simulate Ctrl+J on the container
       fireEvent.keyDown(container!, {
         key: 'j',
-        ctrlKey: true
+        ctrlKey: true,
       });
-      
+
       await waitFor(() => {
         expect(screen.getByTestId('prompt-sidebar')).toBeInTheDocument();
         expect(screen.getByText('Selected: Test')).toBeInTheDocument();
@@ -122,7 +131,7 @@ describe('SimplePromptEditor', () => {
 
     it('should not open on other key combinations', async () => {
       const user = userEvent.setup();
-      
+
       render(
         <SimplePromptEditor onTextReplace={mockOnTextReplace}>
           <textarea defaultValue="Hello world" />
@@ -132,12 +141,12 @@ describe('SimplePromptEditor', () => {
       const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
       textarea.setSelectionRange(0, 5);
       fireEvent.select(textarea);
-      
+
       // Try other keys
       await user.keyboard('{Meta>}k{/Meta}');
       await user.keyboard('j');
       await user.keyboard('{Alt>}j{/Alt}');
-      
+
       expect(screen.queryByTestId('prompt-sidebar')).not.toBeInTheDocument();
     });
   });
@@ -145,7 +154,7 @@ describe('SimplePromptEditor', () => {
   describe('Escape Key', () => {
     it('should close prompt editor when escape is pressed', async () => {
       const user = userEvent.setup();
-      
+
       render(
         <SimplePromptEditor onTextReplace={mockOnTextReplace}>
           <textarea defaultValue="Hello world" />
@@ -153,28 +162,28 @@ describe('SimplePromptEditor', () => {
       );
 
       const container = screen.getByText(/Hello world/).closest('.prompt-editor-container');
-      
+
       // Mock getSelection
       const mockSelection = {
         toString: () => 'Hello',
-        removeAllRanges: vi.fn()
+        removeAllRanges: vi.fn(),
       };
-      vi.spyOn(window, 'getSelection').mockReturnValue(mockSelection as any);
-      
+      vi.spyOn(window, 'getSelection').mockReturnValue(mockSelection as unknown as Selection);
+
       // Open editor with Meta+J
       fireEvent.keyDown(container!, {
         key: 'j',
-        metaKey: true
+        metaKey: true,
       });
-      
+
       await waitFor(() => {
         expect(screen.getByTestId('prompt-sidebar')).toBeInTheDocument();
       });
-      
+
       // Find close button and click it
       const closeButton = screen.getByText('Close');
       await user.click(closeButton);
-      
+
       await waitFor(() => {
         expect(screen.queryByTestId('prompt-sidebar')).not.toBeInTheDocument();
       });
@@ -184,7 +193,7 @@ describe('SimplePromptEditor', () => {
   describe('Text Replacement', () => {
     it('should replace selected text when apply is clicked', async () => {
       const user = userEvent.setup();
-      
+
       render(
         <SimplePromptEditor onTextReplace={mockOnTextReplace}>
           <textarea defaultValue="Hello world" />
@@ -192,27 +201,27 @@ describe('SimplePromptEditor', () => {
       );
 
       const container = screen.getByText(/Hello world/).closest('.prompt-editor-container');
-      
+
       // Mock selection
       const mockSelection = {
         toString: () => 'world',
-        removeAllRanges: vi.fn()
+        removeAllRanges: vi.fn(),
       };
-      vi.spyOn(window, 'getSelection').mockReturnValue(mockSelection as any);
-      
+      vi.spyOn(window, 'getSelection').mockReturnValue(mockSelection as unknown as Selection);
+
       // Open editor
       fireEvent.keyDown(container!, {
         key: 'j',
-        metaKey: true
+        metaKey: true,
       });
-      
+
       await waitFor(() => {
         expect(screen.getByTestId('prompt-sidebar')).toBeInTheDocument();
       });
-      
+
       // Click apply
       await user.click(screen.getByText('Apply'));
-      
+
       // Should call text replace and close
       expect(mockOnTextReplace).toHaveBeenCalledWith('world', 'replaced text');
       expect(screen.queryByTestId('prompt-sidebar')).not.toBeInTheDocument();
@@ -222,7 +231,7 @@ describe('SimplePromptEditor', () => {
   describe('Sidebar State Management', () => {
     it('should clear selection when closing', async () => {
       const user = userEvent.setup();
-      
+
       render(
         <SimplePromptEditor onTextReplace={mockOnTextReplace}>
           <textarea defaultValue="Hello world" />
@@ -230,31 +239,31 @@ describe('SimplePromptEditor', () => {
       );
 
       const container = screen.getByText(/Hello world/).closest('.prompt-editor-container');
-      
+
       // Mock getSelection
       const mockRemoveAllRanges = vi.fn();
       const mockSelection = {
         toString: () => 'Hello',
-        removeAllRanges: mockRemoveAllRanges
+        removeAllRanges: mockRemoveAllRanges,
       };
-      vi.spyOn(window, 'getSelection').mockReturnValue(mockSelection as any);
-      
+      vi.spyOn(window, 'getSelection').mockReturnValue(mockSelection as unknown as Selection);
+
       // Open editor
       fireEvent.keyDown(container!, {
         key: 'j',
-        metaKey: true
+        metaKey: true,
       });
-      
+
       await waitFor(() => {
         expect(screen.getByTestId('prompt-sidebar')).toBeInTheDocument();
       });
-      
+
       // Click close
       await user.click(screen.getByText('Close'));
-      
+
       // Should close sidebar
       expect(screen.queryByTestId('prompt-sidebar')).not.toBeInTheDocument();
-      
+
       // Selection should be cleared
       expect(mockRemoveAllRanges).toHaveBeenCalled();
     });

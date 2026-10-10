@@ -33,12 +33,12 @@ Here's another paragraph with some technical content. The prompt editor can help
   return (
     <div className="max-w-4xl mx-auto space-y-4">
       <h1 className="text-2xl font-bold text-[#24292f]">Prompt Editor Demo</h1>
-      
+
       <Card className="border border-[#d0d7de] p-4">
         <p className="text-sm text-[#57606a] mb-4">
           Select any text in the editor below to activate the AI prompt editor.
         </p>
-        
+
         <SimplePromptEditor onTextReplace={handleTextReplace}>
           <textarea
             value={content}

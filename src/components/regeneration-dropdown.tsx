@@ -28,13 +28,13 @@ interface RegenerationDropdownProps {
     useUserStyle?: boolean;
   }) => void;
   isRegenerating: boolean;
-  user?: any;
+  user?: { id: string } | null;
 }
 
-export default function RegenerationDropdown({ 
-  onRegenerate, 
-  isRegenerating, 
-  user 
+export default function RegenerationDropdown({
+  onRegenerate,
+  isRegenerating,
+  user,
 }: RegenerationDropdownProps) {
   const [presets, setPresets] = useState<RegenerationPreset[]>([]);
   const [userPreferences, setUserPreferences] = useState<UserPreferences | null>(null);
@@ -55,12 +55,12 @@ export default function RegenerationDropdown({
         .select('*')
         .eq('is_default', true)
         .order('name');
-      
+
       if (error) {
         console.error('Error loading presets:', error);
         return;
       }
-      
+
       setPresets(data || []);
     } catch (err) {
       console.error('Error loading presets:', err);
@@ -74,12 +74,13 @@ export default function RegenerationDropdown({
         .select('*')
         .eq('user_id', user.id)
         .single();
-      
-      if (error && error.code !== 'PGRST116') { // PGRST116 = not found
+
+      if (error && error.code !== 'PGRST116') {
+        // PGRST116 = not found
         console.error('Error loading user preferences:', error);
         return;
       }
-      
+
       setUserPreferences(data);
     } catch (err) {
       console.error('Error loading user preferences:', err);
@@ -115,13 +116,11 @@ export default function RegenerationDropdown({
         onClick={handleSimpleRegenerate}
         disabled={isRegenerating}
         className="flex items-center gap-2 px-2 md:px-3"
-        title={isRegenerating ? "Regenerating..." : "Regenerate content"}
+        title={isRegenerating ? 'Regenerating...' : 'Regenerate content'}
       >
-        <RefreshCw
-          className={`h-4 w-4 ${isRegenerating ? "animate-spin" : ""}`}
-        />
+        <RefreshCw className={`h-4 w-4 ${isRegenerating ? 'animate-spin' : ''}`} />
         <span className="hidden sm:inline">
-          {isRegenerating ? "Regenerating..." : "Regenerate"}
+          {isRegenerating ? 'Regenerating...' : 'Regenerate'}
         </span>
       </Button>
     );
@@ -136,34 +135,32 @@ export default function RegenerationDropdown({
             size="sm"
             disabled={isRegenerating}
             className="flex items-center gap-2 px-2 md:px-3"
-            title={isRegenerating ? "Regenerating..." : "Regenerate options"}
+            title={isRegenerating ? 'Regenerating...' : 'Regenerate options'}
           >
-            <RefreshCw
-              className={`h-4 w-4 ${isRegenerating ? "animate-spin" : ""}`}
-            />
+            <RefreshCw className={`h-4 w-4 ${isRegenerating ? 'animate-spin' : ''}`} />
             <span className="hidden sm:inline">
-              {isRegenerating ? "Regenerating..." : "Regenerate"}
+              {isRegenerating ? 'Regenerating...' : 'Regenerate'}
             </span>
             <ChevronDown className="h-3 w-3 hidden sm:inline" />
           </Button>
         </DropdownMenuTrigger>
-        
+
         <DropdownMenuContent align="end" className="w-64">
           <DropdownMenuLabel>Regeneration Options</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          
+
           <DropdownMenuItem onClick={handleSimpleRegenerate}>
             <RefreshCw className="h-4 w-4 mr-2" />
             Standard Regenerate
           </DropdownMenuItem>
-          
+
           {userPreferences && userPreferences.writing_samples.length > 0 && (
             <DropdownMenuItem onClick={handleUserStyleRegenerate}>
               <Settings className="h-4 w-4 mr-2" />
               Use My Writing Style
             </DropdownMenuItem>
           )}
-          
+
           {presets.length > 0 && (
             <>
               <DropdownMenuSeparator />
@@ -178,14 +175,12 @@ export default function RegenerationDropdown({
                     <Wand2 className="h-3 w-3" />
                     <span className="font-medium">{preset.name}</span>
                   </div>
-                  <span className="text-xs text-muted-foreground pl-5">
-                    {preset.description}
-                  </span>
+                  <span className="text-xs text-muted-foreground pl-5">{preset.description}</span>
                 </DropdownMenuItem>
               ))}
             </>
           )}
-          
+
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => setShowCustomDialog(true)}>
             <Wand2 className="h-4 w-4 mr-2" />
@@ -206,7 +201,9 @@ export default function RegenerationDropdown({
             <Textarea
               placeholder="e.g., Make it more beginner-friendly with step-by-step explanations..."
               value={customPrompt}
-              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setCustomPrompt(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                setCustomPrompt(e.target.value)
+              }
               className="min-h-[100px]"
             />
           </div>
@@ -214,10 +211,7 @@ export default function RegenerationDropdown({
             <Button variant="outline" onClick={() => setShowCustomDialog(false)}>
               Cancel
             </Button>
-            <Button 
-              onClick={handleCustomRegenerate}
-              disabled={!customPrompt.trim()}
-            >
+            <Button onClick={handleCustomRegenerate} disabled={!customPrompt.trim()}>
               Regenerate
             </Button>
           </DialogFooter>

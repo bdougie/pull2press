@@ -16,7 +16,7 @@ export function useTextSelection() {
   const updateSelection = useCallback(() => {
     const sel = window.getSelection();
     console.log('Selection object:', sel);
-    
+
     if (!sel || sel.rangeCount === 0) {
       console.log('No selection or no ranges');
       setSelection({ text: '', rect: null, isCollapsed: true });
@@ -25,7 +25,7 @@ export function useTextSelection() {
 
     const text = sel.toString();
     console.log('Selected text:', text, 'Collapsed:', sel.isCollapsed);
-    
+
     if (!text || sel.isCollapsed) {
       setSelection({ text: '', rect: null, isCollapsed: true });
       return;
@@ -51,7 +51,7 @@ export function useTextSelection() {
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
-    
+
     const delayedUpdateSelection = () => {
       // Add a small delay to ensure selection is complete
       clearTimeout(timeoutId);
@@ -60,16 +60,16 @@ export function useTextSelection() {
         updateSelection();
       }, 200);
     };
-    
+
     // Listen for selection changes
     document.addEventListener('selectionchange', delayedUpdateSelection);
-    
+
     // Also listen for mouseup to catch selections
     document.addEventListener('mouseup', delayedUpdateSelection);
-    
+
     // Listen for keyboard events that might change selection
     document.addEventListener('keyup', delayedUpdateSelection);
-    
+
     // Check initial selection
     updateSelection();
 

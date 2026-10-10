@@ -22,7 +22,7 @@ export function PromptEditor({ children, onTextReplace }: PromptEditorProps) {
       // Since we're using fixed positioning, we don't need to add scroll offsets
       const position = {
         top: rect.bottom + 10,
-        left: Math.max(10, rect.left + (rect.width / 2) - 200), // Center the popup, ensure it's not off-screen
+        left: Math.max(10, rect.left + rect.width / 2 - 200), // Center the popup, ensure it's not off-screen
       };
       console.log('Showing popup at position:', position);
       setPopupPosition(position);
@@ -47,19 +47,18 @@ export function PromptEditor({ children, onTextReplace }: PromptEditorProps) {
 
   return (
     <>
-      <div className="prompt-editor-container">
-        {children}
-      </div>
-      
-      {showPopup && createPortal(
-        <PromptEditorPopup
-          selectedText={selectedText}
-          position={popupPosition}
-          onClose={handleClose}
-          onApply={handleApply}
-        />,
-        document.body
-      )}
+      <div className="prompt-editor-container">{children}</div>
+
+      {showPopup &&
+        createPortal(
+          <PromptEditorPopup
+            selectedText={selectedText}
+            position={popupPosition}
+            onClose={handleClose}
+            onApply={handleApply}
+          />,
+          document.body
+        )}
     </>
   );
 }

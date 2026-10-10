@@ -45,7 +45,7 @@ describe('Markdown Shortcuts Logic', () => {
       // Bold + Italic
       const boldItalic = wrapText(wrapText('text', '*'), '**');
       expect(boldItalic).toBe('***text***');
-      
+
       // Bold code
       const boldCode = wrapText(wrapText('code', '`'), '**');
       expect(boldCode).toBe('**`code`**');

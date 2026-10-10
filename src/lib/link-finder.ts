@@ -55,7 +55,7 @@ export async function findHelpfulLinks(
     };
   } catch (error) {
     console.error('Error finding helpful links:', error);
-    
+
     // Return fallback links if the service fails
     return {
       links: [
@@ -96,7 +96,7 @@ export function formatLinksAsMarkdown(links: LinkSuggestion[]): string {
   };
 
   // Group links by relevance
-  links.forEach(link => {
+  links.forEach((link) => {
     sections[link.relevance].push(link);
   });
 
@@ -105,7 +105,7 @@ export function formatLinksAsMarkdown(links: LinkSuggestion[]): string {
   // Add high relevance links first
   if (sections.high.length > 0) {
     markdown += '### Essential Reading\n\n';
-    sections.high.forEach(link => {
+    sections.high.forEach((link) => {
       markdown += `- [${link.title}](${link.url}) - ${link.description}\n`;
     });
     markdown += '\n';
@@ -114,7 +114,7 @@ export function formatLinksAsMarkdown(links: LinkSuggestion[]): string {
   // Add medium relevance links
   if (sections.medium.length > 0) {
     markdown += '### Additional Resources\n\n';
-    sections.medium.forEach(link => {
+    sections.medium.forEach((link) => {
       markdown += `- [${link.title}](${link.url}) - ${link.description}\n`;
     });
     markdown += '\n';
@@ -123,7 +123,7 @@ export function formatLinksAsMarkdown(links: LinkSuggestion[]): string {
   // Add low relevance links
   if (sections.low.length > 0) {
     markdown += '### Further Reading\n\n';
-    sections.low.forEach(link => {
+    sections.low.forEach((link) => {
       markdown += `- [${link.title}](${link.url}) - ${link.description}\n`;
     });
     markdown += '\n';
@@ -138,7 +138,7 @@ export function formatLinksAsMarkdown(links: LinkSuggestion[]): string {
  * @returns Array of formatted inline link strings
  */
 export function formatLinksAsInline(links: LinkSuggestion[]): string[] {
-  return links.map(link => `[${link.title}](${link.url})`);
+  return links.map((link) => `[${link.title}](${link.url})`);
 }
 
 /**
@@ -147,10 +147,7 @@ export function formatLinksAsInline(links: LinkSuggestion[]): string[] {
  * @param links Link suggestions to insert
  * @returns Content with links inserted
  */
-export function insertLinksIntoContent(
-  content: string,
-  links: LinkSuggestion[]
-): string {
+export function insertLinksIntoContent(content: string, links: LinkSuggestion[]): string {
   // This is a simple implementation that adds links at the end
   // A more sophisticated version could analyze the content and insert links contextually
   return content + formatLinksAsMarkdown(links);

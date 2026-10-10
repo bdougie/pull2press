@@ -10,12 +10,10 @@ describe('cn function', () => {
   it('should handle conditional classes', () => {
     const isActive = true;
     const isDisabled = false;
-    
-    expect(cn(
-      'base-class',
-      isActive && 'active-class',
-      isDisabled && 'disabled-class'
-    )).toBe('base-class active-class');
+
+    expect(cn('base-class', isActive && 'active-class', isDisabled && 'disabled-class')).toBe(
+      'base-class active-class'
+    );
   });
 
   it('should properly merge Tailwind classes using tailwind-merge', () => {
@@ -29,7 +27,8 @@ describe('cn function', () => {
   });
 
   it('should handle object notation from clsx', () => {
-    expect(cn('base-class', { 'active-class': true, 'disabled-class': false }))
-      .toBe('base-class active-class');
+    expect(cn('base-class', { 'active-class': true, 'disabled-class': false })).toBe(
+      'base-class active-class'
+    );
   });
 });

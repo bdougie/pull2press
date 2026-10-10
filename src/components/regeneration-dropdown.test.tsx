@@ -9,12 +9,12 @@ vi.mock('../lib/supabase', () => ({
       select: vi.fn(() => ({
         eq: vi.fn(() => ({
           single: vi.fn(() => Promise.resolve({ data: null, error: null })),
-          order: vi.fn(() => Promise.resolve({ data: [], error: null }))
+          order: vi.fn(() => Promise.resolve({ data: [], error: null })),
         })),
-        order: vi.fn(() => Promise.resolve({ data: [], error: null }))
-      }))
-    }))
-  }
+        order: vi.fn(() => Promise.resolve({ data: [], error: null })),
+      })),
+    })),
+  },
 }));
 
 describe('RegenerationDropdown', () => {
@@ -25,25 +25,15 @@ describe('RegenerationDropdown', () => {
   });
 
   it('should render regenerate button', () => {
-    render(
-      <RegenerationDropdown 
-        onRegenerate={mockOnRegenerate}
-        isRegenerating={false}
-      />
-    );
-    
+    render(<RegenerationDropdown onRegenerate={mockOnRegenerate} isRegenerating={false} />);
+
     expect(screen.getByRole('button')).toBeInTheDocument();
     expect(screen.getByText('Regenerate')).toBeInTheDocument();
   });
 
   it('should show loading state when regenerating', () => {
-    render(
-      <RegenerationDropdown 
-        onRegenerate={mockOnRegenerate}
-        isRegenerating={true}
-      />
-    );
-    
+    render(<RegenerationDropdown onRegenerate={mockOnRegenerate} isRegenerating={true} />);
+
     expect(screen.getByRole('button')).toBeDisabled();
     expect(screen.getByText('Regenerating...')).toBeInTheDocument();
   });

@@ -1,17 +1,18 @@
-import { useState, useEffect } from "react";
-import { AuthButton } from "./components/auth-button";
-import { HistoryDrawer } from "./components/history-drawer";
-import { supabase } from "./lib/supabase";
-import type { CachedPost } from "./lib/supabase";
-import { Routes, Route, useNavigate, Link } from "react-router-dom";
-import HomeEnhanced from "./pages/HomeEnhanced";
-import Edit from "./pages/Edit";
-import Settings from "./pages/Settings";
-import Loading from "./pages/Loading";
-import PromptEditorDemo from "./pages/PromptEditorDemo";
-import SelectionTest from "./pages/SelectionTest";
+import { useState, useEffect } from 'react';
+import { AuthButton } from './components/auth-button';
+import { HistoryDrawer } from './components/history-drawer';
+import { supabase } from './lib/supabase';
+import type { CachedPost } from './lib/supabase';
+import { Routes, Route, useNavigate, Link } from 'react-router-dom';
+import HomeEnhanced from './pages/HomeEnhanced';
+import Edit from './pages/Edit';
+import Settings from './pages/Settings';
+import Loading from './pages/Loading';
+import PromptEditorDemo from './pages/PromptEditorDemo';
+import SelectionTest from './pages/SelectionTest';
 
 function App() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [user, setUser] = useState<any>(null);
   const navigate = useNavigate();
 
@@ -67,7 +68,7 @@ function App() {
 
       <footer className="border-t border-gray-200 py-4 mt-auto bg-[#f6f8fa]">
         <div className="container mx-auto px-4 text-center text-sm text-gray-500">
-          Made with ❤️ from{" "}
+          Made with ❤️ from{' '}
           <a
             href="https://b.dougie.dev"
             target="_blank"

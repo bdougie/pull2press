@@ -28,16 +28,16 @@ export async function* streamPromptResponse(
     // Get Supabase URL and anon key from environment
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
     const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-    
+
     if (!supabaseUrl || !supabaseAnonKey) {
       throw new Error('Supabase URL or anon key not configured');
     }
-    
+
     const response = await fetch(`${supabaseUrl}/functions/v1/prompt-editor`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${supabaseAnonKey}`,
+        Authorization: `Bearer ${supabaseAnonKey}`,
       },
       body: JSON.stringify({
         selectedText,
@@ -62,7 +62,7 @@ export async function* streamPromptResponse(
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
-      
+
       const chunk = decoder.decode(value);
       if (chunk) {
         yield chunk;

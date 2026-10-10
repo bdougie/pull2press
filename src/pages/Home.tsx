@@ -1,12 +1,13 @@
-import { Button } from "../components/ui/button";
-import { Card } from "../components/ui/card";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { fetchPRData } from "../lib/github";
-import { generateBlogPost } from "../lib/openai";
-import { supabase } from "../lib/supabase";
+import { Button } from '../components/ui/button';
+import { Card } from '../components/ui/card';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { fetchPRData } from '../lib/github';
+import { generateBlogPost } from '../lib/openai';
+import { supabase } from '../lib/supabase';
+import type { User } from '../types/user';
 
-export default function Home({ user }: { user: any }) {
+export default function Home({ user }: { user: User | null }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -17,19 +18,19 @@ export default function Home({ user }: { user: any }) {
     setError(null);
 
     const formData = new FormData(e.currentTarget);
-    const prUrl = formData.get("pr-url") as string;
+    const prUrl = formData.get('pr-url') as string;
 
     try {
       // If user is logged in, check cache first
       if (user) {
         const { data: existingPosts, error: fetchError } = await supabase
-          .from("cached_posts")
-          .select("*")
-          .eq("pr_url", prUrl)
-          .eq("user_id", user.id);
+          .from('cached_posts')
+          .select('*')
+          .eq('pr_url', prUrl)
+          .eq('user_id', user.id);
 
         if (fetchError && fetchError.code !== 'PGRST116') {
-          console.error("Error fetching cached posts:", fetchError);
+          console.error('Error fetching cached posts:', fetchError);
         }
 
         if (existingPosts && existingPosts.length > 0) {
@@ -47,7 +48,7 @@ export default function Home({ user }: { user: any }) {
       let postId = null;
       if (user) {
         const { data: savedPost, error: saveError } = await supabase
-          .from("cached_posts")
+          .from('cached_posts')
           .insert({
             pr_url: prUrl,
             content,
@@ -58,7 +59,7 @@ export default function Home({ user }: { user: any }) {
           .single();
 
         if (saveError) {
-          console.error("Error saving post:", saveError);
+          console.error('Error saving post:', saveError);
         } else if (savedPost) {
           postId = savedPost.id;
         }
@@ -68,34 +69,29 @@ export default function Home({ user }: { user: any }) {
       if (postId) {
         navigate(`/edit/${postId}`);
       } else {
-        navigate(`/edit`, { 
-          state: { 
+        navigate(`/edit`, {
+          state: {
             content: content,
-            prUrl: prUrl 
-          } 
+            prUrl: prUrl,
+          },
         });
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      setError(err instanceof Error ? err.message : 'An error occurred');
       setIsLoading(false);
     }
   };
 
   return (
     <Card className="p-6 bg-white">
-      <h2 className="text-2xl font-semibold mb-6">
-        Transform Your Pull Request into a Blog Post
-      </h2>
+      <h2 className="text-2xl font-semibold mb-6">Transform Your Pull Request into a Blog Post</h2>
       <p className="text-gray-600 mb-6">
-        Turn your code commits into engaging developer-friendly blog
-        posts. Simply paste your pull request URL below to get started.
+        Turn your code commits into engaging developer-friendly blog posts. Simply paste your pull
+        request URL below to get started.
       </p>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label
-            htmlFor="pr-url"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
+          <label htmlFor="pr-url" className="block text-sm font-medium text-gray-700 mb-1">
             Pull Request URL
           </label>
           <input
@@ -113,11 +109,11 @@ export default function Home({ user }: { user: any }) {
             type="submit"
             className="w-full"
             style={{ backgroundColor: '#2da44e', color: 'white' }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2c974b'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2da44e'}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#2c974b')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#2da44e')}
             disabled={isLoading}
           >
-            {isLoading ? "Generating..." : "Generate Blog Post"}
+            {isLoading ? 'Generating...' : 'Generate Blog Post'}
           </Button>
           {!user && (
             <p className="text-sm text-muted-foreground text-center italic">

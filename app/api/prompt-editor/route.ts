@@ -8,10 +8,7 @@ export async function POST(request: NextRequest) {
     // Get API key from environment
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
-      return NextResponse.json(
-        { error: 'OpenAI API key not configured' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'OpenAI API key not configured' }, { status: 500 });
     }
 
     const openai = new OpenAI({
@@ -19,20 +16,25 @@ export async function POST(request: NextRequest) {
     });
 
     const messages = [
-      { role: 'system', content: systemPrompt || `You are an AI writing assistant integrated into a blog editor. 
+      {
+        role: 'system',
+        content:
+          systemPrompt ||
+          `You are an AI writing assistant integrated into a blog editor. 
 When given text and instructions, provide helpful improvements, corrections, or additions.
 Be concise and directly provide the improved text without excessive explanation.
-Maintain the original tone and style unless specifically asked to change it.` },
+Maintain the original tone and style unless specifically asked to change it.`,
+      },
       ...(previousMessages || []),
-      { 
-        role: 'user', 
-        content: `Selected text: "${selectedText}"\n\nInstruction: ${userPrompt}` 
-      }
+      {
+        role: 'user',
+        content: `Selected text: "${selectedText}"\n\nInstruction: ${userPrompt}`,
+      },
     ];
 
     const stream = await openai.chat.completions.create({
       model: 'gpt-4o',
-      messages: messages as any,
+      messages: messages as OpenAI.ChatCompletionMessageParam[],
       stream: true,
       temperature: 0.7,
       max_tokens: 1000,
@@ -60,14 +62,11 @@ Maintain the original tone and style unless specifically asked to change it.` },
       headers: {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
+        Connection: 'keep-alive',
       },
     });
   } catch (error) {
     console.error('Error in prompt editor API:', error);
-    return NextResponse.json(
-      { error: 'Failed to process request' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to process request' }, { status: 500 });
   }
 }
